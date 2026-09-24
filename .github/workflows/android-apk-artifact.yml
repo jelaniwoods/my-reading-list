@@ -37,7 +37,7 @@ jobs:
           cmdline-tools-version: '13114758'
           log-accepted-android-sdk-licenses: false
           packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
-      - uses: gradle/actions/setup-gradle@4c125117fe7c5aed11272ec4213f602f012f89f2 # v5
+      - uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5
       - name: Build the debug APK and manifest
         run: bin/android apk-artifact
         env:
