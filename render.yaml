@@ -9,6 +9,8 @@ services:
     # Foundation deliberately omits `plan`: Render defaults a new service to
     # paid Starter and preserves an existing service's current instance type.
     # The application owner may add `plan: free` only for an explicitly disposable demo.
+    # Owner decision: this is an explicitly disposable public demo, so it uses Free.
+    plan: free
     region: ohio # US East (AWS us-east-2); create the Neon database in the same region
     autoDeployTrigger: checksPass
     healthCheckPath: /ready
