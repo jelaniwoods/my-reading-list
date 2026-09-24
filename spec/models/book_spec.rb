@@ -1,5 +1,17 @@
 require "rails_helper"
 
+# == Schema Information
+#
+# Table name: books
+#
+#  id         :uuid             not null, primary key
+#  author     :string           not null
+#  finished   :boolean          default(FALSE), not null
+#  note       :text
+#  title      :string           not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
 RSpec.describe Book, type: :model do
   it "is valid with the required data" do
     expect(build(:book)).to be_valid
@@ -31,6 +43,16 @@ RSpec.describe Book, type: :model do
     record.validate
 
     expect(record.errors[:finished]).not_to be_empty
+  end
+
+  it "starts unfinished" do
+    expect(Book.new.finished).to be(false)
+  end
+
+  it "saves as unfinished when finished is not given" do
+    book = Book.create!(title: "Beloved", author: "Toni Morrison")
+
+    expect(book.reload.finished).to be(false)
   end
 
   it "accepts false for finished" do

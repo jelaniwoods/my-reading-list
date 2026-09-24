@@ -5,23 +5,24 @@ These notes are not Compiler input. Read `.firstdraft/gaps.json` separately as t
 
 ## Agreed requirements
 
-### New books start unfinished
+None outstanding.
 
-- **Requirement:** a book's Finished checkbox starts unchecked. The Plan authors `book.finished` as a required
-  Boolean with literal default `false`. The reviewed GapSet reports that this default is not applied
-  (`foundation_plan.gap.field_modifier.default` at `book.finished`).
-- **Needed:** make `false` the real default at the model and database levels, for example with a migration that
-  sets the column default to `false`. The New Book form's checkbox should then start unchecked.
-- **Acceptance examples:**
-  - Opening New Book on the web, iPhone, or Android shows Finished unchecked.
-  - Saving a book with only a title and author succeeds, and the book shows Finished = No.
-  - `Book.new.finished` is `false` in the Rails console.
+## Completed
+
+### New books start unfinished (done 2026-09-24)
+
+- The reviewed GapSet reported that `book.finished`'s authored default `false` was not applied
+  (`foundation_plan.gap.field_modifier.default`). Migration
+  `db/migrate/20260924220000_default_books_finished_to_false.rb` now sets the column default to `false`.
+- Covered by `spec/models/book_spec.rb` ("starts unfinished"; "saves as unfinished when finished is not given").
+  `.firstdraft/gaps.json` is the retained compile-time record and is intentionally left unchanged.
 
 ## Context
 
 - This is a public demonstration with disposable data and no accounts. Anyone can list, view, add, edit, and
   delete books on the web, iPhone, and Android. Do not add authentication.
-- Do not publish to GitHub or deploy unless the owner asks separately.
+- The owner published the source to a public GitHub repository and deployed it to Render (free plan) with a
+  Neon database. Treat further deploy changes as owner decisions.
 
 ## Open questions
 
