@@ -1,0 +1,9 @@
+<%# locals: (code:, title:, description:) %>
+<section class="flex min-h-[calc(100svh-10rem)] flex-col items-center justify-center gap-2 py-8 text-center wrap-anywhere">
+  <p class="text-[min(8rem,25vw)] leading-tight font-bold"><%= code %></p>
+  <h1 class="font-medium"><%= title %></h1>
+  <p class="max-w-sm text-balance text-muted-foreground"><%= description %></p>
+  <div class="mt-6 flex flex-wrap justify-center gap-4">
+    <%= link_to t("errors.back_home"), root_path, class: "btn" %>
+  </div>
+</section>

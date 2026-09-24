@@ -1,0 +1,7 @@
+APP_DISPLAY_NAME = $()Reading List$()
+APP_BUNDLE_IDENTIFIER = invalid.firstdraft.reading-list
+MARKETING_VERSION = 1.0
+CURRENT_PROJECT_VERSION = 1
+RAILS_ORIGIN = https:/$()/reading-list.invalid
+FOUNDATION_PLAN_SHA256 = 3096a118457dd09f41ecdd482cd5788152895aeeda77bd5f3d3914a958aa904b
+INFOPLIST_KEY_UIUserInterfaceStyle = Light

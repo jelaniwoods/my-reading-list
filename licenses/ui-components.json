@@ -1,0 +1,208 @@
+{
+  "retrievedAt": "2026-09-14T19:58:23.888908+00:00",
+  "style": "base-vega",
+  "cliVersion": "4.21.0",
+  "baseUiVersion": "1.8.0",
+  "sourceMethod": "Captured official base-vega registry source from the approved Oscar reference; Rails aliases and Lucide icons resolved, with the documented application adaptations.",
+  "records": [
+    {
+      "name": "button",
+      "path": "app/javascript/components/ui/button.tsx",
+      "registry": {
+        "style": "base-vega",
+        "component": "button",
+        "url": "https://ui.shadcn.com/r/styles/base-vega/button.json",
+        "sha256": "4f4221d600a0b3991aef0fc4fc274511d98630a629cacbe24e4e5308be72113c",
+        "dependencies": [
+          "cn"
+        ],
+        "registryDependencies": []
+      },
+      "coreSourceSha256": "cfe245bb73a5a0cd595b1cea4d3bda6970b792487eb8e418df8362e1903e4db3"
+    },
+    {
+      "name": "label",
+      "path": "app/javascript/components/ui/label.tsx",
+      "registry": {
+        "style": "base-vega",
+        "component": "label",
+        "url": "https://ui.shadcn.com/r/styles/base-vega/label.json",
+        "sha256": "deec98789527956c5d8bc49c7829847d626387385f62355d88e0423dae638d22",
+        "dependencies": [
+          "cn"
+        ],
+        "registryDependencies": []
+      },
+      "coreSourceSha256": "a9716fe693e598cefed172e0858b4bbfdd90c075958ba7beb4023bc9711c93e6"
+    },
+    {
+      "name": "combobox",
+      "path": "app/javascript/components/ui/combobox.tsx",
+      "registry": {
+        "style": "base-vega",
+        "component": "combobox",
+        "url": "https://ui.shadcn.com/r/styles/base-vega/combobox.json",
+        "sha256": "0ac84ab42a51b4815ca78a8bfa69c3c8bf6a965437907e320ded42a09587e2f5",
+        "dependencies": [
+          "cn",
+          "@base-ui/react"
+        ],
+        "registryDependencies": [
+          "button",
+          "input-group"
+        ]
+      },
+      "coreSourceSha256": "597e718c2591a7030a866265fee33e72aa716af402b55f7d3144f828fd0a850a"
+    },
+    {
+      "name": "popover",
+      "path": "app/javascript/components/ui/popover.tsx",
+      "registry": {
+        "style": "base-vega",
+        "component": "popover",
+        "url": "https://ui.shadcn.com/r/styles/base-vega/popover.json",
+        "sha256": "17513473532b392203e586e21bcf84b827d09eb4ae837700bf4d6b10a7383e98",
+        "dependencies": [
+          "cn"
+        ],
+        "registryDependencies": []
+      },
+      "coreSourceSha256": "9274b0333035308b40c747cf2286e75e5bb2f23dacf66db02aed6e4f5225b7f6"
+    },
+    {
+      "name": "alert-dialog",
+      "path": "app/javascript/components/ui/alert-dialog.tsx",
+      "registry": {
+        "style": "base-vega",
+        "component": "alert-dialog",
+        "url": "https://ui.shadcn.com/r/styles/base-vega/alert-dialog.json",
+        "sha256": "a6cdc5f604d452e03b91b8635a72f8e1b665b2898c54081dfc771fee96b1dd96",
+        "dependencies": [
+          "cn"
+        ],
+        "registryDependencies": [
+          "button"
+        ]
+      },
+      "coreSourceSha256": "2887b268d1bb2fdb2212b672923b0dd0647803cc21609ae53d6286f8799b834f"
+    },
+    {
+      "name": "sheet",
+      "path": "app/javascript/components/ui/sheet.tsx",
+      "registry": {
+        "style": "base-vega",
+        "component": "sheet",
+        "url": "https://ui.shadcn.com/r/styles/base-vega/sheet.json",
+        "sha256": "8b5b6797b6744a24f8ee18e520a94c870f5340d6cae6b9ab3207f01da4c73d5f",
+        "dependencies": [
+          "cn"
+        ],
+        "registryDependencies": [
+          "button"
+        ]
+      },
+      "coreSourceSha256": "9ff2627c334be31ccba77d2c77d7efa71035666029ba1350af2928f88032e4b6"
+    },
+    {
+      "name": "calendar",
+      "path": "app/javascript/components/ui/calendar.tsx",
+      "registry": {
+        "url": "https://ui.shadcn.com/r/styles/radix-vega/calendar.json",
+        "sha256": "f418e372be43deac0924cdf4c590a79755de70bb751cb33ff448af3a7c526700",
+        "dependencies": [
+          "cn",
+          "react-day-picker@latest",
+          "date-fns"
+        ],
+        "registryDependencies": [
+          "button"
+        ]
+      },
+      "copiedSourceSha256": "1e43e1438a0329aa5afa71dcb564921c1e6a41de101992cd637845928eab4d6e",
+      "coreSourceSha256": "c651974184ea83d611838948a0239e5c00e6d6d325426f0427eca012374f2c1c"
+    },
+    {
+      "name": "input",
+      "path": "app/javascript/components/ui/input.tsx",
+      "registry": {
+        "url": "https://ui.shadcn.com/r/styles/radix-vega/input.json",
+        "sha256": "2d49e7dc9ab8a8c18421160252fceb0587eea304468b70169f0e201b1eed1dff",
+        "dependencies": [
+          "cn"
+        ],
+        "registryDependencies": []
+      },
+      "copiedSourceSha256": "09f8799039f5ffcd3aba2130f59e8e8ef6447e01bd911a7f9010450d9d30f5e1",
+      "coreSourceSha256": "528607b13fe1792676571c2a4e11347ba5023281d47e7b3d4cf171fb865e0e64"
+    },
+    {
+      "name": "input-group",
+      "path": "app/javascript/components/ui/input-group.tsx",
+      "registry": {
+        "url": "https://ui.shadcn.com/r/styles/radix-vega/input-group.json",
+        "sha256": "0ec3d8dbef17995213fdd76b935766f01504bf75f0f38c8406aefa865ca65d78",
+        "dependencies": [
+          "cn"
+        ],
+        "registryDependencies": [
+          "button",
+          "input",
+          "textarea"
+        ]
+      },
+      "copiedSourceSha256": "b1f3ed539b96a796b2c69afef217d398dd81e44214f7b14ae814a0bcedf25c37",
+      "coreSourceSha256": "05a9f00cad64ceeae27b544f78ed9cfac732a5a12a7dfd54394a997756f79b32"
+    },
+    {
+      "name": "textarea",
+      "path": "app/javascript/components/ui/textarea.tsx",
+      "registry": {
+        "url": "https://ui.shadcn.com/r/styles/radix-vega/textarea.json",
+        "sha256": "81ef3626a825ed47b8c6b8d12eb308be5a21c2d24bdd7938b60d729dd816af96",
+        "dependencies": [
+          "cn"
+        ],
+        "registryDependencies": []
+      },
+      "copiedSourceSha256": "6d096ef81ee782d94696d0ddad1c926e530d952b54b9ff9e8b837d8bbeea8d00",
+      "coreSourceSha256": "9710a9228e79df4e1dbb331204a3901e36c82687d016b4b2a8e58a34db157707"
+    },
+    {
+      "name": "sonner",
+      "path": "app/javascript/components/ui/sonner.tsx",
+      "registry": {
+        "url": "https://ui.shadcn.com/r/styles/radix-vega/sonner.json",
+        "sha256": "845df0f2f0bb2bdf9d5fab1d46bef580e40dbf593b573b39fa88fc8c826decdd",
+        "dependencies": [
+          "sonner",
+          "next-themes"
+        ],
+        "registryDependencies": [],
+        "style": "radix-vega",
+        "component": "sonner"
+      },
+      "copiedSourceSha256": "25fc5fa1cd3d4db09d7b5787767f16806d2fa1c27c05b512819aeb4ce2ca5529",
+      "coreSourceSha256": "29da88854359788a760fe948c844620f64a47f3e8e2cd383951f58fd60aaf482",
+      "adaptation": "Introduced to Core from the Oscar reference: remove next-themes/useTheme, use app-toaster to avoid Basecoat class ownership, and add Lucide status icons and semantic gray2/gray4 variables. Registry dependencies describe the captured upstream source; installed dependencies are recorded in package-lock.json."
+    }
+  ],
+  "localChanges": [
+    "Button retains data-variant/data-size and native touch sizing.",
+    "Label makes htmlFor and children explicit for the application linter.",
+    "Popover forwards collisionPadding to Positioner.",
+    "Combobox uses a direct package subpath; Rails aliases and Lucide icons resolved; no application font override.",
+    "Stock shadcn Zinc tokens replace the authored web palette; controls use upstream color variants. Overlay reduced motion remains explicit.",
+    "Calendar, Input, Textarea and InputGroup retain their earlier Core source. Sonner is introduced from the Oscar reference, adapted from its captured radix-vega wrapper.",
+    "IslandBoundary wraps each root in CSPProvider using the initial document nonce.",
+    "ResponsiveNavigation composes stock default and icon-sm buttons without custom web minimum sizes; native touch adaptations remain shared.",
+    "Sonner retains the upstream stylesheet in the CSS bundle, omitting only its unnonced package-entrypoint injection."
+  ],
+  "note": "Registry files are mutable; hashes identify captured source. Earlier radix-vega captures remain identified individually even though these components do not import Radix. copiedSourceSha256 records the earlier copied-source checkpoint; coreSourceSha256 identifies the present file after documented adaptations.",
+  "theme": {
+    "name": "zinc",
+    "upstreamRevision": "2b3e6d4f8d9161fe5c19340dc383aade392012dd",
+    "source": "https://github.com/shadcn-ui/ui/blob/2b3e6d4f8d9161fe5c19340dc383aade392012dd/apps/v4/registry/themes.ts",
+    "sourceSha256": "60cb5ed25f7b39d9973e2280f476dd2119a4268317f45bd7ee3cac7883db8ea0",
+    "coreSourceSha256": "c05c73d7937955f3b1badba378bafed05f01523b25440c6d428cc1c92065b19e"
+  }
+}

@@ -1,0 +1,43 @@
+<%# locals: (record:, form_namespace:, cancel_to:) %>
+<% error_heading_id = [form_namespace, "form-errors"].join("-") %>
+<%= form_with model: record, namespace: form_namespace,
+  html: {novalidate: true},
+  class: "space-y-6" do |form| %>
+  <%= render "shared/ui/form_errors", errors: record.errors,
+    field_ids: {title: form.field_id(:title), author: form.field_id(:author), note: form.field_id(:note), finished: form.field_id(:finished)},
+    title: t(".errors"), id: error_heading_id %>
+
+  <fieldset class="field">
+    <%= form.label :title, record.class.human_attribute_name(:title), class: "label" %>
+    <% field_errors = record.errors.full_messages_for(:title) %>
+    <% field_error_id = [form.field_id(:title), "errors"].join("-") %>
+    <%= form.text_field :title, required: true, class: "input w-full", aria: (field_errors.any? ? {invalid: true, describedby: field_error_id} : nil) %>
+    <%= render "shared/ui/field_errors", errors: field_errors, id: field_error_id %>
+  </fieldset>
+  <fieldset class="field">
+    <%= form.label :author, record.class.human_attribute_name(:author), class: "label" %>
+    <% field_errors = record.errors.full_messages_for(:author) %>
+    <% field_error_id = [form.field_id(:author), "errors"].join("-") %>
+    <%= form.text_field :author, required: true, class: "input w-full", aria: (field_errors.any? ? {invalid: true, describedby: field_error_id} : nil) %>
+    <%= render "shared/ui/field_errors", errors: field_errors, id: field_error_id %>
+  </fieldset>
+  <fieldset class="field">
+    <%= form.label :note, record.class.human_attribute_name(:note), class: "label" %>
+    <% field_errors = record.errors.full_messages_for(:note) %>
+    <% field_error_id = [form.field_id(:note), "errors"].join("-") %>
+    <%= form.text_area :note, rows: 6, class: "textarea w-full", aria: (field_errors.any? ? {invalid: true, describedby: field_error_id} : nil) %>
+    <%= render "shared/ui/field_errors", errors: field_errors, id: field_error_id %>
+  </fieldset>
+  <fieldset class="field">
+    <%= form.label :finished, record.class.human_attribute_name(:finished), class: "label" %>
+    <% field_errors = record.errors.full_messages_for(:finished) %>
+    <% field_error_id = [form.field_id(:finished), "errors"].join("-") %>
+    <%= form.check_box :finished, class: "checkbox", aria: (field_errors.any? ? {invalid: true, describedby: field_error_id} : nil) %>
+    <%= render "shared/ui/field_errors", errors: field_errors, id: field_error_id %>
+  </fieldset>
+
+  <div class="form-actions">
+    <%= form.button class: "btn", data: {size: "lg"} %>
+    <%= link_to t(".cancel"), cancel_to, class: "btn", data: {variant: "ghost", size: "lg"} %>
+  </div>
+<% end %>

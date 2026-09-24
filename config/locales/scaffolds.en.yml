@@ -1,0 +1,54 @@
+---
+en:
+  activerecord:
+    models:
+      book: Book
+    attributes:
+      book:
+        title: Title
+        author: Author
+        note: Note
+        finished: Finished
+  helpers:
+    submit:
+      book:
+        create: Create Book
+        update: Update Book
+  shared:
+    main_navigation:
+      label: Primary navigation
+    values:
+      boolean:
+        'true': 'Yes'
+        'false': 'No'
+      missing: Not set
+    pagination:
+      label: Pagination
+      empty:
+        heading: That page is empty
+        body: Return to the first page to keep browsing this collection.
+        action: Back to the first page
+  books:
+    index:
+      title: Books
+      heading: Books
+      empty:
+        heading: No records yet
+        body: This collection does not have any records to show yet.
+      new_action: Add Book
+    show:
+      title: "%{descriptor}"
+    book:
+      back: All books
+      edit_action: Edit
+      delete_action: Delete
+      delete_confirmation: Delete this Book?
+    new:
+      title: New Book
+      heading: New Book
+    edit:
+      title: Edit Book
+      heading: Edit Book
+    form:
+      errors: Please correct the highlighted fields
+      cancel: Cancel

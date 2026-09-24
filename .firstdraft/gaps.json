@@ -1,0 +1,30 @@
+{
+  "format": "firstdraft.foundation-gaps/2",
+  "source": {
+    "sha256": "7486e19a66cf0cbe9f42c5f9d0ee4d11d96a397788a4ce63f0c99072bb52b323"
+  },
+  "project": {
+    "id": "01a0d534-d210-7dae-8b95-494b32694043",
+    "graph_version": 1
+  },
+  "analysis": {
+    "release": "foundation-plan-rails/application-2026-09-24-rate-limit"
+  },
+  "compiler_release": "foundation-plan-rails/compiler-application-2026-09-24-rate-limit",
+  "target": {
+    "id": "rails",
+    "profile": "rails-sketch/2026-09"
+  },
+  "gaps": [
+    {
+      "classification": "target_support_gap",
+      "code": "foundation_plan.gap.field_modifier.default",
+      "kind": "field_modifier",
+      "status": "partially_generated",
+      "pointer": "/application/entities/0/fields/3/default",
+      "readable_path": "book.finished",
+      "reason": "The current release does not realize this authored Field modifier.",
+      "consequence": "the authored default is not applied"
+    }
+  ]
+}

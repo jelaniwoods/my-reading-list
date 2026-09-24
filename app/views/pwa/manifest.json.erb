@@ -1,0 +1,21 @@
+{
+  "name": <%= raw I18n.t("app_name").to_json %>,
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "scope": "/",
+  "description": <%= raw I18n.t("pwa.description").to_json %>,
+  "theme_color": "#FFFFFF",
+  "background_color": "#FFFFFF"
+}

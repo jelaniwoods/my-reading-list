@@ -1,0 +1,10 @@
+<%# locals: (book:, heading_tag: :h2, dom_prefix: :list) %>
+<li id="<%= dom_id(book, dom_prefix) %>" class="@container">
+  <div class="item record-list-item">
+    <section>
+      <%= content_tag heading_tag, class: "record-list-title" do %>
+        <%= link_to book.title, book_path(book), class: "record-link" %>
+      <% end %>
+    </section>
+  </div>
+</li>

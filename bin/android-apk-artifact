@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+
+Dir.chdir(File.expand_path("..", __dir__))
+
+def capture!(*command)
+  stdout, stderr, status = Open3.capture3(*command)
+  abort "#{command.first} failed: #{stderr}" unless status.success?
+  stdout
+end
+
+commit = capture!("git", "rev-parse", "HEAD").strip
+approved = ENV.fetch("APPROVED_SOURCE_SHA", commit)
+abort "APPROVED_SOURCE_SHA must match the full HEAD commit" unless approved.match?(/\A[0-9a-f]{40}\z/) && approved == commit
+unless capture!("git", "status", "--porcelain", "--untracked-files=normal").empty?
+  abort "Commit or stash changes before labeling an APK with the current commit."
+end
+
+output = File.expand_path(ENV.fetch("ANDROID_APK_ARTIFACT_OUTPUT_DIRECTORY", "android/build/apk-artifact"))
+abort "Artifact output must be a separate directory" if ["/", Dir.pwd].include?(output)
+abort "Artifact output directory must be empty: #{output}" if File.exist?(output) && (!File.directory?(output) || !Dir.empty?(output))
+sdk = ENV["ANDROID_HOME"] || ENV["ANDROID_SDK_ROOT"]
+abort "Install Android SDK 36 and set ANDROID_HOME; see ANDROID_PREVIEW.md" if sdk.to_s.empty?
+aapt = File.join(sdk, "build-tools", "36.0.0", "aapt2")
+abort "Android build-tools 36.0.0 are missing from #{sdk}" unless File.executable?(aapt)
+
+abort "Android build failed" unless system("android/gradlew", "-p", "android", "assembleDebug", "--console=plain")
+apk = "android/app/build/outputs/apk/debug/app-debug.apk"
+abort "The build did not produce one standalone debug APK" unless File.file?(apk)
+badging = capture!(aapt, "dump", "badging", apk)
+application_id = badging[/\Apackage: name='([^']+)'/, 1]
+abort "The APK has no application ID" unless application_id
+debuggable = badging.lines.any? { |line| line.strip == "application-debuggable" }
+abort "Revyl requires a debuggable APK" unless debuggable
+native_abis = badging[/^native-code: (.+)$/, 1].to_s.scan(/'([^']+)'/).flatten
+unless native_abis.empty? || (native_abis & %w[arm64-v8a x86_64]).any?
+  abort "Revyl requires arm64-v8a or x86_64 when the APK contains native libraries"
+end
+xml = capture!(aapt, "dump", "xmltree", apk, "--file", "AndroidManifest.xml")
+plan_sha256 = xml[/name\(0x01010003\)="FoundationPlanSHA256"[^\n]*\n[^\n]*value\(0x01010024\)="([0-9a-f]{64})"/, 1]
+abort "The APK does not carry its generated Foundation Plan digest" unless plan_sha256
+
+FileUtils.mkdir_p(output)
+artifact = File.join(output, "FoundationApp.apk")
+FileUtils.cp(apk, artifact)
+manifest = {
+  "format" => "firstdraft-android-apk-v1",
+  "repository" => ENV.fetch("GITHUB_REPOSITORY", "local"),
+  "commit_sha" => commit,
+  "application_id" => application_id,
+  "foundation_plan_sha256" => plan_sha256,
+  "app_platform" => "android",
+  "debuggable" => debuggable,
+  "native_abis" => native_abis,
+  "min_sdk" => badging[/^minSdkVersion:'(\d+)'/, 1],
+  "target_sdk" => badging[/^targetSdkVersion:'(\d+)'/, 1],
+  "artifact_sha256" => Digest::SHA256.file(artifact).hexdigest,
+  "gradle_distribution_sha256" => File.read("android/gradle/wrapper/gradle-wrapper.properties")[/^distributionSha256Sum=(.+)$/, 1]
+}
+File.write(File.join(output, "manifest.json"), JSON.pretty_generate(manifest) + "\n")
+puts "APK: #{artifact}"
+puts "Manifest: #{File.join(output, "manifest.json")}"

@@ -1,0 +1,7 @@
+<% descriptor = @book.title %>
+<% content_for :title, t(".title", descriptor: descriptor) %>
+
+<section class="page-section content-detail hotwire-native:py-6">
+  <%= render "book", book: @book %>
+
+</section>

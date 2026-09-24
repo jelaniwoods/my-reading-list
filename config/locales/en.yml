@@ -1,0 +1,350 @@
+---
+en:
+  app_name: "Reading List"
+  errors:
+    back_home: Back to home
+    forbidden:
+      body: You do not have permission to perform this action.
+      code: '403'
+      heading: Access denied
+    internal_error:
+      body: We apologize for the inconvenience. Please try again later.
+      code: '500'
+      heading: Something went wrong
+    not_found:
+      body: The page you were looking for does not exist or has moved.
+      code: '404'
+      heading: Page not found
+    unprocessable:
+      body: The change you requested could not be processed. Please check your input and try again.
+      code: '422'
+      heading: Change rejected
+  flash:
+    notifications: Notifications
+    dismiss: Dismiss
+  nav:
+    menu: Menu
+    close_menu: Close menu
+    skip_to_content: Skip to main content
+    theme: Theme
+    theme_light: Light
+    theme_dark: Dark
+    theme_system: System
+  pages:
+    draft_notice: >-
+      Draft—complete the bracketed details before inviting real users.
+    policy_attribution:
+      heading: >-
+        Policy source and license
+      body_html: >-
+        Adapted from %{source_link}, licensed under %{license_link}. The original material is provided without
+        warranties as described in the %{source_license_link}.
+      source: >-
+        Basecamp open-source policies by 37signals LLC
+      license: >-
+        CC BY 4.0
+      source_license: >-
+        source license
+      changes: >-
+        Changes include application-neutral wording, removal of Basecamp-specific practices, and bracketed
+        details for the operator to complete. 37signals does not endorse this application.
+      scope: >-
+        This notice concerns policy text; it grants no license to this application's code, branding, user
+        content, or other material.
+    terms:
+      heading: >-
+        Terms of service
+      introduction:
+        paragraph_1_html: >-
+          Effective date: <strong>[EFFECTIVE DATE]</strong>
+        paragraph_2_html: >-
+          These Terms govern use of this application and its related services (the “Service”). “We,” “us,” and
+          “our” mean <strong>[OPERATOR LEGAL NAME]</strong>, the operator of the Service. “You” means the
+          person using the Service or, where that person is authorized to act for an organization, that
+          organization. Questions about these Terms can be sent to <strong>[TERMS CONTACT]</strong>.
+        paragraph_3: >-
+          When you accept these Terms, you agree to follow them when using the Service. If you act for an
+          organization, you represent that you have authority to bind it. Do not use the Service if you do not
+          agree to these Terms. These Terms include limitations of liability and disclaimers of warranties;
+          they apply only to the extent the law permits.
+      account:
+        heading: >-
+          Your account and use of the Service
+        paragraph_1_html: >-
+          You are responsible for keeping your account credentials secure and for the activity you authorize
+          through your account. Keep the information you provide accurate and do not use another person's
+          account without permission. Let us know at <strong>[TERMS CONTACT]</strong> if you believe your
+          account has been compromised. To the extent permitted by law, we are not responsible for losses
+          caused by your failure to protect your credentials.
+        paragraph_2: >-
+          You are responsible for the content you submit and for having the rights and permissions needed to
+          use that content in the Service. Your use must comply with applicable law and must not infringe
+          anyone else's rights. Do not use the Service to threaten or harass others, distribute malicious
+          software, gain unauthorized access, interfere with other users, or disrupt the Service. Do not evade
+          an access restriction or continue using an account after we have suspended or terminated your
+          permission to use it.
+        paragraph_3_html: >-
+          <strong>[COMPLETE: State any eligibility or audience restrictions that the operator has chosen and
+          can support. Do not insert a default minimum age or claim that the Service is suitable for every
+          audience.]</strong>
+      content:
+        heading: >-
+          Content you provide
+        paragraph_1_html: >-
+          You retain your ownership rights in content you submit to the Service. You give us permission to
+          host, store, reproduce, transmit, and display that content as needed to provide the Service to you
+          and to carry out sharing or other actions you request. This permission does not transfer ownership
+          of your content to us. Personal information is also addressed in the %{privacy_link}.
+        paragraph_2: >-
+          You must have the rights necessary to give us that permission. We may refuse or remove content that
+          violates these Terms or applicable law. We are not required to review every submission before it
+          appears. The availability of content in the Service does not mean we endorse it.
+      ownership:
+        heading: >-
+          Our Service and intellectual property
+        paragraph_1: >-
+          The Service, its original software, visual design, and branding belong to us or our licensors. Using
+          the Service does not give you ownership of them. Except as permitted by law, an applicable license,
+          or our written permission, you may not copy, modify, distribute, sell, resell, or commercially
+          exploit the Service or its original content. Permission to use the Service does not include
+          permission to use our name or logos in a way that suggests sponsorship or endorsement.
+        paragraph_2: >-
+          Third-party components remain subject to their own licenses. Nothing in these Terms restricts rights
+          those licenses grant you, rights granted by the policy text's Creative Commons notice below, or uses
+          the law permits without our permission. The policy-text license does not license the application's
+          original code, branding, user content, or other business material.
+      payments:
+        heading: >-
+          Payment terms, if offered
+        paragraph_1_html: >-
+          <strong>[COMPLETE OR REMOVE: If the Service charges fees, set out the actual price or pricing-page
+          reference, payment timing, renewal and cancellation process, applicable taxes, and refund policy. If
+          it does not charge fees, remove this section. No billing, trial, automatic renewal, refund, or
+          credit-card handling practice is assumed by this starter.]</strong>
+      termination:
+        heading: >-
+          Suspension, termination, and account closure
+        paragraph_1: >-
+          To the extent permitted by law, we may suspend or end your access to the Service, remove content, or
+          refuse future access for a violation of these Terms or for another lawful reason. We may act
+          immediately where needed to protect the Service, its users, or others, or to comply with law.
+          Suspension or termination can make your account and content inaccessible. We reserve these rights
+          without promising that we will detect or act on every violation.
+        paragraph_2_html: >-
+          You may stop using the Service at any time. <strong>[COMPLETE: Explain the actual account-closure or
+          cancellation process, including a working route or contact, and any effect on existing payment
+          obligations.]</strong> Before closing an account, keep any copies of your content that you need and
+          are entitled to retain.
+        paragraph_3_html: >-
+          Account closure, removal of content, and deletion from retained systems or backups are different
+          matters. The actual retention and deletion practices must be set out in the %{privacy_link}.
+      changes:
+        heading: >-
+          Changes and availability
+        paragraph_1: >-
+          We may change, suspend, or discontinue all or part of the Service, including features or access,
+          subject to any notice or other obligation that applicable law or a separate agreement requires. We
+          do not promise to maintain a particular feature or to provide uninterrupted availability. We may
+          impose or change usage limits to protect the Service and other users.
+        paragraph_2_html: >-
+          We may revise these Terms. <strong>[COMPLETE: Describe the notice and effective-date process the
+          operator will actually use for material changes.]</strong> A change to these Terms cannot take away
+          rights the law does not allow us to take away.
+      integrations:
+        heading: >-
+          Other services and integrations
+        paragraph_1: >-
+          If you choose to use a separate service or integration with this Service, that provider's terms
+          govern your relationship with it. We do not control third-party services and, to the extent
+          permitted by law, are not responsible for their availability, actions, or omissions. This section
+          does not grant a third party permission to access your account or personal information.
+      warranties:
+        heading: >-
+          Warranties and service limitations
+        paragraph_1_html: >-
+          <strong>To the fullest extent permitted by law, the Service is provided “as is” and “as available,”
+          without warranties of any kind, whether express, implied, or statutory, including warranties of
+          merchantability, fitness for a particular purpose, title, and non-infringement.</strong> We do not
+          warrant that the Service will meet your requirements, be uninterrupted or error-free, or that every
+          defect will be corrected. You are responsible for deciding whether the Service is suitable for your
+          use.
+        paragraph_2: >-
+          Nothing in these Terms excludes a warranty, guarantee, remedy, or other right that applicable law
+          does not allow us to exclude.
+      liability:
+        heading: >-
+          Liability
+        paragraph_1_html: >-
+          <strong>To the fullest extent permitted by law, we and our licensors will not be liable to you or
+          any third party for direct, indirect, incidental, special, consequential, punitive, or exemplary
+          damages, or for loss of profits, goodwill, use, or data, arising out of or relating to the Service
+          or these Terms.</strong> This includes loss arising from inability to use the Service, unauthorized
+          access to or alteration of data, and the conduct of others, regardless of the legal theory and even
+          if we have been advised of the possibility of that loss.
+        paragraph_2: >-
+          This exclusion applies only to liability the law allows us to exclude. Nothing in these Terms
+          excludes or limits liability or rights that cannot lawfully be excluded or limited.
+      general:
+        heading: >-
+          General terms and contact
+        paragraph_1: >-
+          If we do not exercise a right under these Terms in one instance, that does not mean we have waived
+          that right. If a provision cannot lawfully be enforced, it will apply only to the extent permitted,
+          and the remaining provisions will continue to apply where the law allows.
+        paragraph_2_html: >-
+          <strong>[COMPLETE OR REMOVE: If the operator chooses a governing-law or forum clause, insert the
+          reviewed clause here. No country, state, court, arbitration procedure, or waiver is selected by this
+          starter.]</strong>
+        paragraph_3_html: >-
+          Questions and notices about these Terms: <strong>[TERMS CONTACT]</strong>.
+    privacy:
+      heading: >-
+        Privacy policy
+      introduction:
+        paragraph_1_html: >-
+          Effective date: <strong>[EFFECTIVE DATE]</strong>
+        paragraph_2_html: >-
+          This policy describes how <strong>[OPERATOR LEGAL NAME]</strong> (“we,” “us,” or “our”) handles
+          personal information in connection with this application (the “Service”). It addresses what
+          information is collected, why it is used, who receives it, how long it is kept, and the choices or
+          rights that may be available. Contact us about this policy or your information at <strong>[PRIVACY
+          CONTACT]</strong>.
+        paragraph_3_html: >-
+          <strong>[COMPLETE: Identify the Service and people covered by this notice. If the operator handles
+          information for another organization, explain that relationship and the relevant contact. Do not
+          claim a controller, processor, business, or service-provider legal status without confirming the
+          actual arrangement.]</strong>
+      collection:
+        heading: >-
+          Information we collect and why
+        paragraph_1: >-
+          Personal information can include information you provide directly, information created as you use a
+          service, and information supplied by others. The categories actually collected by this Service,
+          their sources, and the purposes for using them are set out below. A category is not permission to
+          collect information that has not been disclosed or to use it for an unrelated purpose.
+        paragraph_2_html: >-
+          <strong>[COMPLETE: Replace this block with the actual categories, sources, and uses. For an
+          account-enabled application, cover login identifiers, account/profile fields, authentication and
+          recovery records, and content users create or share. Check the running application and its providers
+          for request or security logs, device information, support correspondence, and any other collection.
+          Add payment, analytics, advertising, location, sensitive information, or information from third
+          parties only when actually present. State the applicable processing bases where required. Do not
+          turn this list of possibilities into a claim that all are collected.]</strong>
+        paragraph_3_html: >-
+          Information necessary to provide a requested function can be different from information requested
+          for an optional purpose. <strong>[COMPLETE: Explain which information is required or optional, what
+          happens if it is not provided, and the actual controls for optional communications or other optional
+          uses.]</strong>
+      cookies:
+        heading: >-
+          Cookies and similar technology
+        paragraph_1: >-
+          A cookie is a small piece of information stored by a browser. Browser controls can generally block
+          or delete cookies. Restricting a cookie needed for a particular feature can prevent that feature
+          from working. Other storage and tracking technologies may require different controls.
+        paragraph_2_html: >-
+          <strong>[COMPLETE: Describe this Service's actual cookies and similar technologies, their purposes
+          and lifetimes, any third-party access, and the controls users can exercise. Verify session and
+          security storage. Explicitly settle any analytics or advertising use and any required choices.
+          Include any advertising or CAPTCHA services actually used.]</strong>
+      sharing:
+        heading: >-
+          Access, sharing, and service providers
+        paragraph_1: >-
+          The fact that information is stored by an application does not by itself explain who can see it.
+          Information shared with other users, access by the operator, and processing by outside providers
+          need separate descriptions.
+        paragraph_2_html: >-
+          <strong>[COMPLETE: Explain the actual visibility of content and account information to other users,
+          administrators, the public, and organizations administering an account. Describe staff access and
+          its purposes. Identify actual providers or recipient categories and the data and purposes involved,
+          including hosting, email, storage, support, payment, analytics, and any AI processing that is used.
+          Describe any other disclosures, including legal requests, protection of rights, or a business
+          transfer. State the actual sale, sharing, targeted-advertising, and training practices and
+          applicable choices. Do not promise “we never sell,” “staff only access with consent,” or “we never
+          train models” without verified practices supporting the statement.]</strong>
+        paragraph_3: >-
+          If you follow a link to another service or choose to provide information to another provider, review
+          that provider's privacy notice as well. This notice does not establish the practices of an
+          independent third party.
+      retention:
+        heading: >-
+          Retention, removal, and account closure
+        paragraph_1: >-
+          Removing content from an application screen, closing an account, and deleting all retained copies
+          are different operations. A useful retention description must account for the information still held
+          in active systems, logs, backups, and provider systems, as well as any applicable preservation
+          obligations.
+        paragraph_2_html: >-
+          <strong>[COMPLETE: State the actual retention periods or concrete criteria for each relevant
+          category, the account-closure and content-deletion process, any backup or provider delays, and any
+          lawful exceptions. Explain how to request deletion and what remains afterward. Confirm the process
+          operationally. Include retained copies in backups and provider systems; do not promise deletion
+          deadlines that the operator cannot meet.]</strong>
+      security:
+        heading: >-
+          Security and processing locations
+        paragraph_1: >-
+          No online service can promise complete security. Information about safeguards should describe
+          measures that are actually used, rather than imply that risk has been eliminated.
+        paragraph_2_html: >-
+          <strong>[COMPLETE: Describe the security measures the operator can accurately state, the actual
+          processing/storage countries, and any applicable international transfer arrangements. Confirm
+          provider and backup locations as well as the application host. Do not promise encrypted backups,
+          particular certifications, U.S.-only storage, or a data-processing addendum that has not been
+          established.]</strong>
+      rights:
+        heading: >-
+          Your choices and rights
+        paragraph_1: >-
+          Depending on applicable law and the circumstances, you may have rights to access or obtain a copy of
+          personal information, correct it, request deletion, restrict or object to particular processing,
+          withdraw consent for processing based on consent, or receive information in a portable form. Some
+          laws provide choices about sale, sharing, targeted advertising, or significant automated decisions.
+          Rights may be subject to conditions and exceptions; their availability depends on the law that
+          applies to you and the relevant processing.
+        paragraph_2_html: >-
+          To raise a privacy question or request, contact <strong>[PRIVACY CONTACT]</strong>. We may need
+          information to verify that a request concerns you, or that you are authorized to act for someone
+          else. Do not send passwords in a privacy request. A request to delete information needed for an
+          account or feature may affect the availability of that account or feature.
+        paragraph_3_html: >-
+          <strong>[COMPLETE: Provide the actual request channels, verification and response process, account
+          controls, applicable opt-out and consent-withdrawal mechanisms, and any required appeal,
+          representative, or supervisory-authority information. Confirm applicable rights and regional
+          disclosures for the intended audience. Do not claim that every right or a self-service export/delete
+          control is available everywhere.]</strong>
+      audience:
+        heading: >-
+          Audience and changes to this policy
+        paragraph_1_html: >-
+          <strong>[COMPLETE: Explain the intended audience and any age restrictions or practices involving
+          children. Confirm the actual audience and any practices involving children's information.]</strong>
+        paragraph_2_html: >-
+          <strong>[COMPLETE: Describe how the operator will keep this notice current and communicate changes,
+          including any legally required notice or new choice. Use an effective date that reflects the
+          completed policy. Terms acceptance at signup is not consent to unrelated processing or
+          marketing.]</strong>
+        paragraph_3_html: >-
+          Questions about this policy or personal information: <strong>[PRIVACY CONTACT]</strong>.
+  pwa:
+    description: A Rails application on the Foundation baseline.
+  ui:
+    cancel: Cancel
+    destroy:
+      label: Delete
+      title: Delete this record?
+      description: This action cannot be undone.
+    reference:
+      placeholder: Choose an option…
+      search: Search %{label}
+      options: '%{label} options'
+      empty: No matching options.
+      clear: None
+    date:
+      open: Open %{label} calendar
+      calendar: '%{label} calendar'
+      previous: Previous month
+      next: Next month
+      today: Today
+      selected: Selected

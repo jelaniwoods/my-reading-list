@@ -1,0 +1,10 @@
+
+<nav aria-label="<%= t(".label") %>">
+  <ul class="flex flex-wrap items-center gap-1">
+    <li>
+      <%= link_to t("books.index.heading"), books_path,
+        class: "btn", data: {variant: "ghost", size: "sm"},
+        aria: {current: ("page" if controller_name == "books")} %>
+    </li>
+  </ul>
+</nav>

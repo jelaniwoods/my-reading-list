@@ -1,0 +1,11 @@
+<% message = flash[:success].present? ? {id: SecureRandom.uuid, text: flash[:success]} : nil %>
+<%= turbo_mount("FlashToasts", props: {message:, label: t("flash.notifications"), dismissLabel: t("flash.dismiss")}) do |controller_name| %>
+  <div data-island-fallback>
+    <% if message %>
+      <div data-transient-message data-turbo-temporary>
+        <div class="mb-6 alert"><p><%= message[:text] %></p></div>
+      </div>
+    <% end %>
+  </div>
+  <%= tag.div "", "data-#{controller_name}-target" => "mount" %>
+<% end %>

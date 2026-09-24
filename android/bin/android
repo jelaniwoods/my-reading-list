@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+action="${1:-help}"
+if [ "$#" -gt 0 ]; then shift; fi
+case "$action" in
+  doctor)
+    java -version
+    sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+    if [[ -z "$sdk" || ! -f "$sdk/platforms/android-36/android.jar" || ! -x "$sdk/build-tools/36.0.0/aapt2" ]]; then
+      echo 'Install Android SDK platform 36 and build-tools 36.0.0 and set ANDROID_HOME.' >&2
+      exit 1
+    fi
+    ./gradlew --version
+    ;;
+  build) exec ./gradlew --console=plain :app:assembleDebug "$@" ;;
+  release) exec ./gradlew --console=plain :app:assembleRelease "$@" ;;
+  lint) exec ./gradlew --console=plain :app:lintDebug "$@" ;;
+  test) exec ./gradlew --console=plain :app:testDebugUnitTest "$@" ;;
+  device-test) exec ./gradlew --console=plain :app:connectedDebugAndroidTest "$@" ;;
+  help|-h|--help) printf '%s\n' 'Usage: bin/android doctor|build|release|lint|test|device-test' ;;
+  *) printf '%s\n' 'Usage: bin/android doctor|build|release|lint|test|device-test' >&2; exit 1 ;;
+esac

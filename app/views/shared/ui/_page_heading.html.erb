@@ -1,0 +1,10 @@
+<%# locals: (title:, description: nil, eyebrow: nil, hide_in_native: false) %>
+<div class="page-heading">
+  <% if eyebrow.present? %>
+    <p class="page-eyebrow <%= "hotwire-native:hidden" if hide_in_native %>"><%= eyebrow %></p>
+  <% end %>
+  <h1 class="<%= "hotwire-native:sr-only" if hide_in_native %>"><%= title %></h1>
+  <% if description.present? %>
+    <p class="page-description"><%= description %></p>
+  <% end %>
+</div>

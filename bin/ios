@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root="$(cd "$(dirname "$0")/.." && pwd)"
+case "${1:-help}" in
+  simulator-artifact) shift; exec "$root/bin/ios-simulator-artifact" "$@" ;;
+  preview)
+    shift
+    if [[ "${1:-}" != "revyl" ]]; then
+      echo 'Usage: bin/ios preview revyl [--server URL | doctor | status | stop]' >&2
+      exit 1
+    fi
+    shift
+    exec ruby "$root/bin/ios-revyl" "$@"
+    ;;
+  help|-h|--help)
+    echo 'Usage: bin/ios preview revyl --server URL'
+    echo '       bin/ios preview revyl doctor|status|stop'
+    echo '       bin/ios simulator-artifact'
+    echo '       bin/ios doctor|lint|build|test'
+    ;;
+  *) exec "$root/ios/bin/ios" "$@" ;;
+esac

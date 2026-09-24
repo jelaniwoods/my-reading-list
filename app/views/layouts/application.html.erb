@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<% theme = Rails.application.config.x.ui_theme %>
+<html lang="<%= I18n.locale %>" data-turbo-not-loaded="true" <%= tag.attributes(class: ("dark" if theme == "dark"), data: {theme_mode: theme, theme: (theme if theme.in?(["light", "dark"]))}) %>>
+  <head>
+    <title><%= full_page_title %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="<%= t("app_name") %>">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+
+    <link rel="icon" href="/icon.png" type="image/png" sizes="512x512">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" sizes="any">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <%= render "shared/theme" %>
+
+    <%# Link only the compiled Tailwind bundle, not its @import-bearing source file. %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+  </head>
+
+  <body class="min-h-screen bg-background text-foreground" data-hotwire-native-app="<%= hotwire_native_app? %>">
+    <%= link_to t("nav.skip_to_content"), "#main-content", class: "sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded focus:bg-background focus:p-3" %>
+
+    <% unless hotwire_native_app? %>
+      <header class="app-header">
+        <div class="app-shell app-header-inner">
+          <div class="app-brand">
+            <%= link_to t("app_name"), root_path %>
+          </div>
+          <% navigation = render "shared/main_navigation" %>
+          <div class="app-navigation">
+            <% if navigation.strip.present? %>
+              <%= turbo_mount("ResponsiveNavigation", props: {html: navigation, title: t("app_name"), menuLabel: t("nav.menu"), closeLabel: t("nav.close_menu")}) do |controller_name| %>
+                <div data-island-fallback>
+                  <div class="app-navigation-desktop app-navigation-content"><%= navigation %></div>
+                  <details class="app-navigation-mobile app-navigation-fallback">
+                    <summary class="btn" data-variant="ghost"><%= t("nav.menu") %></summary>
+                    <div class="app-navigation-content"><%= navigation %></div>
+                  </details>
+                </div>
+                <%= tag.div "", "data-#{controller_name}-target" => "mount" %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </header>
+    <% end %>
+
+    <main id="main-content" class="app-shell app-main" tabindex="-1">
+      <%= render "shared/flash" unless content_for?(:inline_flash) %>
+      <%= render "shared/toast" %>
+      <%= yield %>
+    </main>
+  </body>
+</html>

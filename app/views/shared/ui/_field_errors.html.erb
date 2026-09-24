@@ -1,0 +1,8 @@
+<%# locals: (errors:, id: nil) %>
+<% if errors.any? %>
+  <ul id="<%= id %>" class="field-errors">
+    <% errors.each do |error| %>
+      <li><%= error %></li>
+    <% end %>
+  </ul>
+<% end %>

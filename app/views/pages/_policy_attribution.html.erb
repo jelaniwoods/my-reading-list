@@ -1,0 +1,11 @@
+<%# locals: (policy:) %>
+
+<footer class="mt-10 space-y-3 border-t pt-6 text-sm leading-6 text-muted-foreground">
+  <h2 class="text-base font-semibold text-foreground"><%= t("pages.policy_attribution.heading") %></h2>
+  <p><%= t("pages.policy_attribution.body_html",
+    source_link: link_to(t("pages.policy_attribution.source"), "https://github.com/basecamp/policies/blob/d39f6f17bbd90d82b1df9fa7a0df845edd487de0/#{policy}/index.md", class: "text-link"),
+    license_link: link_to(t("pages.policy_attribution.license"), "https://creativecommons.org/licenses/by/4.0/", class: "text-link"),
+    source_license_link: link_to(t("pages.policy_attribution.source_license"), "https://github.com/basecamp/policies/blob/d39f6f17bbd90d82b1df9fa7a0df845edd487de0/LICENSE.md", class: "text-link")) %></p>
+  <p><%= t("pages.policy_attribution.changes") %></p>
+  <p><%= t("pages.policy_attribution.scope") %></p>
+</footer>

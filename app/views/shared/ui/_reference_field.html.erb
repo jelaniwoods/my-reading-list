@@ -1,0 +1,13 @@
+<%# locals: (form:, attribute:, options:, label:, value:, required: false, disabled: false, errors: [], id: nil) %>
+<% raise ArgumentError, "reference_field options must be [label, value] pairs" unless options.all? { |option| option.is_a?(Array) && option.length == 2 && option.none? { |part| part.is_a?(Array) || part.is_a?(Hash) } } %>
+<% field_id = id || form.field_id(attribute) %>
+<% error_id = "#{field_id}-errors" %>
+<% props = {name: form.field_name(attribute), id: "#{field_id}-enhanced", value: value&.to_s, options: options.map { |text, option_value| {label: text.to_s, value: option_value.to_s} }, label: label, error: errors.presence&.join(". "), required: required, disabled: disabled, copy: {placeholder: t("ui.reference.placeholder"), search: t("ui.reference.search", label: label), options: t("ui.reference.options", label: label), empty: t("ui.reference.empty"), clear: t("ui.reference.clear")}} %>
+<%= turbo_mount("ReferencePicker", props: props) do |controller_name| %>
+  <div data-island-fallback class="field">
+    <%= form.label attribute, label, for: field_id, namespace: nil, data: {island_label: true} %>
+    <%= form.select attribute, options, {include_blank: true, selected: value}, {id: field_id, namespace: nil, required: required, disabled: disabled, class: "select", data: {island_input: true, enhanced_id: props[:id]}, aria: {invalid: errors.any?, describedby: (error_id if errors.any?)}} %>
+    <%= tag.p errors.join(". "), id: error_id, class: "field-errors", hidden: errors.empty?, data: {island_errors: true} %>
+  </div>
+  <%= tag.div "", "data-#{controller_name}-target" => "mount" %>
+<% end %>

@@ -1,0 +1,40 @@
+// For format details, see https://containers.dev/implementors/json_reference/.
+// For config options, see the README at: https://github.com/devcontainers/templates/tree/main/src/ruby
+{
+  "name": "Rails app",
+  "dockerComposeFile": "compose.yaml",
+  "service": "rails-app",
+  "workspaceFolder": "/workspaces/project",
+
+  // Features to add to the dev container. More info: https://containers.dev/features.
+  // Node is pinned to the major that production's Dockerfile builds against
+  // (.node-version / NODE_VERSION) so dev and prod bundle assets identically.
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/node:1": { "version": "24.18.0" },
+    "ghcr.io/devcontainers/features/sshd:1.1.0": {},
+    "ghcr.io/rails/devcontainer/features/postgres-client": { "version": "18" }
+  },
+
+  "containerEnv": {
+    "CAPYBARA_SERVER_HOST": "rails-app",
+    "CAPYBARA_SERVER_PORT": "45678",
+    "SELENIUM_HOST": "selenium",
+    "DB_HOST": "postgres"
+  },
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [3000, 5432],
+
+  // Editor niceties for the human/Codespaces path; the agent doesn't need them.
+  "customizations": {
+    "vscode": {
+      "extensions": ["Shopify.ruby-lsp", "bradlc.vscode-tailwindcss"]
+    }
+  },
+
+  "remoteUser": "vscode",
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "bin/setup --skip-server"
+}

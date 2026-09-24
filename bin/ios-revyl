@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require_relative "../script/ios_preview"
+
+exit IosPreview::CLI.new(ARGV).run

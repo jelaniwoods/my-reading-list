@@ -1,0 +1,9 @@
+class ApplicationController < ActionController::Base
+  add_flash_types :success
+  include Pagy::Method
+
+  # The web baseline requires modern browser primitives. Hotwire Native is
+  # exempt because its supported OS floor predates Rails' modern Safari floor;
+  # the native shell supplies navigation while the web remains progressive.
+  allow_browser versions: :modern, unless: :hotwire_native_app?
+end

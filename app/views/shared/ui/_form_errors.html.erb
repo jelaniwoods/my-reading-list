@@ -1,0 +1,17 @@
+<%# locals: (errors:, field_ids:, title:, id:) %>
+<% if errors.any? %>
+  <div class="text-sm text-destructive" role="alert" data-controller="form-errors" aria-labelledby="<%= id %>" tabindex="-1" autofocus>
+    <h2 id="<%= id %>" class="font-medium"><%= title %></h2>
+    <ul class="mt-2 list-disc pl-5 text-sm">
+      <% errors.each do |error| %>
+        <li>
+          <% if (field_id = field_ids[error.attribute]) %>
+            <%= link_to error.full_message, "##{field_id}", class: "text-link", data: {action: "form-errors#focus"} %>
+          <% else %>
+            <%= error.full_message %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

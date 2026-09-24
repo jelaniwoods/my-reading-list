@@ -1,0 +1,55 @@
+<% content_for :title, t("pages.privacy.heading") %>
+
+<article class="content-narrow page-section">
+  <%= render "shared/ui/page_heading", title: t("pages.privacy.heading") %>
+  <div role="alert" class="alert my-6 border-warning text-warning">
+    <p><%= t("pages.draft_notice") %></p>
+  </div>
+  <div class="space-y-8 text-sm leading-6">
+    <div class="space-y-3">
+      <p><%= t("pages.privacy.introduction.paragraph_1_html") %></p>
+      <p><%= t("pages.privacy.introduction.paragraph_2_html") %></p>
+      <p><%= t("pages.privacy.introduction.paragraph_3_html") %></p>
+    </div>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.privacy.collection.heading") %></h2>
+      <p><%= t("pages.privacy.collection.paragraph_1") %></p>
+      <p><%= t("pages.privacy.collection.paragraph_2_html") %></p>
+      <p><%= t("pages.privacy.collection.paragraph_3_html") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.privacy.cookies.heading") %></h2>
+      <p><%= t("pages.privacy.cookies.paragraph_1") %></p>
+      <p><%= t("pages.privacy.cookies.paragraph_2_html") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.privacy.sharing.heading") %></h2>
+      <p><%= t("pages.privacy.sharing.paragraph_1") %></p>
+      <p><%= t("pages.privacy.sharing.paragraph_2_html") %></p>
+      <p><%= t("pages.privacy.sharing.paragraph_3") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.privacy.retention.heading") %></h2>
+      <p><%= t("pages.privacy.retention.paragraph_1") %></p>
+      <p><%= t("pages.privacy.retention.paragraph_2_html") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.privacy.security.heading") %></h2>
+      <p><%= t("pages.privacy.security.paragraph_1") %></p>
+      <p><%= t("pages.privacy.security.paragraph_2_html") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.privacy.rights.heading") %></h2>
+      <p><%= t("pages.privacy.rights.paragraph_1") %></p>
+      <p><%= t("pages.privacy.rights.paragraph_2_html") %></p>
+      <p><%= t("pages.privacy.rights.paragraph_3_html") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.privacy.audience.heading") %></h2>
+      <p><%= t("pages.privacy.audience.paragraph_1_html") %></p>
+      <p><%= t("pages.privacy.audience.paragraph_2_html") %></p>
+      <p><%= t("pages.privacy.audience.paragraph_3_html") %></p>
+    </section>
+  </div>
+  <%= render "pages/policy_attribution", policy: "privacy" %>
+</article>

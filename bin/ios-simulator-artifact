@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+cd "$(dirname "$0")/.."
+
+if [[ "$(uname -s)" != "Darwin" ]]; then
+  echo "iOS Simulator artifacts require macOS and a complete Xcode installation."
+  exit 1
+fi
+
+if [[ -z "${DEVELOPER_DIR:-}" && -d /Applications/Xcode.app/Contents/Developer ]]; then
+  export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+fi
+
+if ! xcodebuild -version >/dev/null 2>&1; then
+  echo "Xcode is unavailable at ${DEVELOPER_DIR:-the selected developer directory}."
+  echo "For GitHub builds, check the pinned DEVELOPER_DIR in .github/workflows/ios-simulator-artifact.yml."
+  echo "For a local build, select a complete Xcode installation. See IOS_PREVIEW.md."
+  exit 1
+fi
+
+project="ios/FoundationApp.xcodeproj"
+scheme="FoundationApp"
+app_name="FoundationApp"
+package_resolved="ios/FoundationApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+output_directory="${IOS_SIMULATOR_ARTIFACT_OUTPUT_DIRECTORY:-$PWD/ios/build/simulator-artifact}"
+derived_data_path="$output_directory/DerivedData"
+app_path="$derived_data_path/Build/Products/Debug-iphonesimulator/$app_name.app"
+artifact_path="$output_directory/$app_name.app.zip"
+manifest="$output_directory/manifest.json"
+
+if [[ -z "$output_directory" || "$output_directory" == "/" || "$output_directory" == "$PWD" ]]; then
+  echo "Refusing unsafe IOS_SIMULATOR_ARTIFACT_OUTPUT_DIRECTORY: $output_directory"
+  exit 1
+fi
+
+commit_sha="$(git rev-parse HEAD)"
+approved_source_sha="${APPROVED_SOURCE_SHA:-$commit_sha}"
+if ! [[ "$approved_source_sha" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "APPROVED_SOURCE_SHA must be a full lowercase Git commit SHA."
+  exit 1
+fi
+
+if [[ "$commit_sha" != "$approved_source_sha" ]]; then
+  echo "HEAD $commit_sha does not match APPROVED_SOURCE_SHA $approved_source_sha."
+  exit 1
+fi
+
+if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
+  echo "Refusing to label a dirty working tree with commit $commit_sha. Commit or stash the changes first."
+  exit 1
+fi
+
+if [[ -e "$output_directory" && ! -d "$output_directory" ]]; then
+  echo "IOS_SIMULATOR_ARTIFACT_OUTPUT_DIRECTORY must be a directory: $output_directory"
+  exit 1
+fi
+
+mkdir -p "$output_directory"
+if [[ -n "$(find "$output_directory" -mindepth 1 -maxdepth 1 -print -quit)" ]]; then
+  echo "IOS_SIMULATOR_ARTIFACT_OUTPUT_DIRECTORY must be empty: $output_directory"
+  exit 1
+fi
+
+xcodebuild build -quiet \
+  -project "$project" \
+  -scheme "$scheme" \
+  -configuration Debug \
+  -destination 'generic/platform=iOS Simulator' \
+  -derivedDataPath "$derived_data_path" \
+  -onlyUsePackageVersionsFromResolvedFile \
+  ARCHS='arm64 x86_64' \
+  ONLY_ACTIVE_ARCH=NO \
+  CODE_SIGNING_ALLOWED=NO \
+  CODE_SIGNING_REQUIRED=NO
+
+test -d "$app_path"
+app_plist="$app_path/Info.plist"
+actual_bundle_identifier="$(plutil -extract CFBundleIdentifier raw "$app_plist")"
+actual_platform="$(plutil -extract DTPlatformName raw "$app_plist")"
+actual_rails_origin="$(plutil -extract RailsOrigin raw "$app_plist")"
+foundation_plan_sha256="$(plutil -extract FoundationPlanSHA256 raw "$app_plist")"
+
+if [[ "$actual_platform" != "iphonesimulator" ]]; then
+  echo "Expected an iPhone Simulator app, found platform $actual_platform."
+  exit 1
+fi
+
+executable_name="$(plutil -extract CFBundleExecutable raw "$app_plist")"
+executable_path="$app_path/$executable_name"
+architectures="$(lipo -archs "$executable_path")"
+if [[ "$architectures" != *"arm64"* || "$architectures" != *"x86_64"* ]]; then
+  echo "Expected universal Simulator architectures arm64 and x86_64, found: $architectures"
+  exit 1
+fi
+
+ditto -c -k --sequesterRsrc --keepParent "$app_path" "$artifact_path"
+artifact_sha256="$(shasum -a 256 "$artifact_path" | awk '{print $1}')"
+executable_sha256="$(shasum -a 256 "$executable_path" | awk '{print $1}')"
+package_resolved_sha256="$(shasum -a 256 "$package_resolved" | awk '{print $1}')"
+xcode_version="$(xcodebuild -version | tr '\n' ' ' | sed 's/[[:space:]]*$//')"
+
+plutil -create xml1 "$manifest"
+plutil -insert format -string firstdraft-simulator-app-v1 "$manifest"
+plutil -insert repository -string "${GITHUB_REPOSITORY:-local}" "$manifest"
+plutil -insert commit_sha -string "$commit_sha" "$manifest"
+plutil -insert bundle_identifier -string "$actual_bundle_identifier" "$manifest"
+plutil -insert rails_origin -string "$actual_rails_origin" "$manifest"
+plutil -insert foundation_plan_sha256 -string "$foundation_plan_sha256" "$manifest"
+plutil -insert app_platform -string "$actual_platform" "$manifest"
+plutil -insert architectures -string "$architectures" "$manifest"
+plutil -insert artifact_sha256 -string "$artifact_sha256" "$manifest"
+plutil -insert executable_sha256 -string "$executable_sha256" "$manifest"
+plutil -insert package_resolved_sha256 -string "$package_resolved_sha256" "$manifest"
+plutil -insert xcode_version -string "$xcode_version" "$manifest"
+plutil -convert json "$manifest"
+
+echo "Created iOS Simulator preview artifact:"
+echo "  $artifact_path"
+echo "  $manifest"

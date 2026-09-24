@@ -1,0 +1,32 @@
+<%# locals: (book:) %>
+<% descriptor = book.title %>
+<article id="<%= dom_id(book) %>" class="card scaffold-card">
+  <header class="record-header">
+    <%= render "shared/ui/page_heading", title: descriptor, hide_in_native: true %>
+    <div class="record-toolbar">
+      <div class="content-actions">
+        <%= render "shared/ui/back", url: books_path, label: t(".back") %>
+        <%= render "shared/ui/edit", url: edit_book_path(book), label: t(".edit_action") %>
+        <%= render "shared/ui/destroy", url: book_path(book),
+          label: t(".delete_action"),
+          title: t(".delete_confirmation"), size: "default" %>
+      </div>
+    </div>
+  </header>
+  <section>
+    <dl class="record-details">
+      <div>
+        <dt><%= Book.human_attribute_name(:author) %></dt>
+        <dd class="whitespace-pre-wrap"><%= book.author %></dd>
+      </div>
+      <div>
+        <dt><%= Book.human_attribute_name(:note) %></dt>
+        <dd class="whitespace-pre-wrap"><%= book.note %></dd>
+      </div>
+      <div>
+        <dt><%= Book.human_attribute_name(:finished) %></dt>
+        <dd class="whitespace-pre-wrap"><%= (book.finished).then { |foundation_value| case foundation_value when true then t("shared.values.boolean.true") when false then t("shared.values.boolean.false") else t("shared.values.missing") end } %></dd>
+      </div>
+    </dl>
+  </section>
+</article>

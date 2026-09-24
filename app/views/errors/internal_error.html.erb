@@ -1,0 +1,4 @@
+<% content_for :title, t("errors.internal_error.heading") %>
+
+<%= render "errors/error", code: t("errors.internal_error.code"),
+  title: t("errors.internal_error.heading"), description: t("errors.internal_error.body") %>

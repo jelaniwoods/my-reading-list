@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<lint>
+    <!-- Dependency updates are reviewed separately; a new upstream release must not break a pinned build. -->
+    <issue id="GradleDependency" severity="ignore" />
+    <!-- API 36 is the qualified target; runner images can contain newer SDKs before we qualify them. -->
+    <issue id="OldTargetApi" severity="ignore" />
+    <issue id="UnusedResources">
+        <ignore regexp=".*[/\\]drawable[/\\]foundation_icon_[a-z_]+\.xml" />
+    </issue>
+</lint>

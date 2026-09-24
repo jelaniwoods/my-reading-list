@@ -1,0 +1,6 @@
+<% if Rails.application.config.x.ui_theme.in?(["auto", "toggle"]) %>
+  <meta name="theme-color" content="#ffffff" data-theme-color="light" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#18181b" data-theme-color="dark" media="(prefers-color-scheme: dark)">
+<% else %>
+  <meta name="theme-color" content="<%= Rails.application.config.x.ui_theme == "dark" ? "#18181b" : "#ffffff" %>">
+<% end %>

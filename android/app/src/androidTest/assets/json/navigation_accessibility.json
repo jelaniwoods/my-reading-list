@@ -1,0 +1,9 @@
+{
+  "settings": {},
+  "rules": [
+    {"patterns": [".*"], "properties": {"context": "default", "uri": "hotwire://fragment/web", "animated": false}},
+    {"patterns": ["/navigation-test/modal(?:/.*)?$"], "properties": {"context": "modal"}},
+    {"patterns": ["/navigation-test/sheet$"], "properties": {"context": "modal", "uri": "hotwire://fragment/web/modal/sheet"}},
+    {"patterns": ["^/__firstdraft_android_more__$"], "properties": {"uri": "hotwire://fragment/firstdraft-more", "title": "More", "presentation": "replace_root"}}
+  ]
+}

@@ -1,0 +1,278 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+command="${1:-help}"
+ios_derived_data=""
+
+if [[ "$#" -gt 0 ]]; then
+  shift
+fi
+
+configure_xcode() {
+  local ios_selected_developer_dir
+
+  if [[ -n "${DEVELOPER_DIR:-}" ]]; then
+    return
+  fi
+
+  if ios_selected_developer_dir="$(xcode-select -p 2>/dev/null)" &&
+    [[ -d "$ios_selected_developer_dir" ]]; then
+    export DEVELOPER_DIR="$ios_selected_developer_dir"
+  elif [[ -d /Applications/Xcode.app/Contents/Developer ]]; then
+    export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+  fi
+}
+
+require_xcode() {
+  if [[ "$(uname -s)" != "Darwin" ]]; then
+    echo "iOS commands require macOS and Xcode." >&2
+    exit 1
+  fi
+
+  configure_xcode
+
+  if ! xcodebuild -version >/dev/null 2>&1; then
+    echo "Select a complete Xcode installation with xcode-select." >&2
+    exit 1
+  fi
+}
+
+build() {
+  require_xcode
+  ios_derived_data="$(mktemp -d "${TMPDIR:-/tmp}/foundation-ios-build.XXXXXX")"
+  trap 'rm -r "$ios_derived_data"' EXIT
+
+  xcodebuild build -quiet \
+    -project "$root/FoundationApp.xcodeproj" \
+    -scheme FoundationApp \
+    -configuration Release \
+    -destination 'generic/platform=iOS' \
+    -derivedDataPath "$ios_derived_data" \
+    -onlyUsePackageVersionsFromResolvedFile \
+    CODE_SIGNING_ALLOWED=NO \
+    CODE_SIGNING_REQUIRED=NO
+}
+
+test_app() {
+  require_xcode
+  local unit_destination
+  local ui_destination
+  local -a xcodebuild_arguments
+  ios_derived_data="$(mktemp -d "${TMPDIR:-/tmp}/foundation-ios-test.XXXXXX")"
+  unit_destination="${IOS_UNIT_TEST_DESTINATION:-platform=iOS Simulator,name=iPhone 17 Pro,OS=latest}"
+  ui_destination="${IOS_UI_TEST_DESTINATION:-platform=iOS Simulator,name=iPhone 17 Pro Max,OS=latest}"
+  trap 'rm -r "$ios_derived_data"' EXIT
+
+  xcodebuild_arguments=(
+    -project "$root/FoundationApp.xcodeproj"
+    -scheme FoundationApp
+    -derivedDataPath "$ios_derived_data"
+    -onlyUsePackageVersionsFromResolvedFile
+    -parallel-testing-enabled NO
+    CODE_SIGNING_ALLOWED=NO
+    CODE_SIGNING_REQUIRED=NO
+  )
+
+  xcodebuild test -quiet \
+    "${xcodebuild_arguments[@]}" \
+    -destination "$unit_destination" \
+    -only-testing:FoundationAppTests
+  xcodebuild test -quiet \
+    "${xcodebuild_arguments[@]}" \
+    -destination "$ui_destination" \
+    -only-testing:FoundationAppUITests
+}
+
+preview_root_is_accepted() {
+  local normalized_value
+  local https_root_pattern='^https://([^/@:?#[:space:]]+|\[[^]/@?#[:space:]]+\])(:[0-9]+)?/?$'
+  local loopback_root_pattern='^http://(localhost|127\.0\.0\.1|\[::1\])(:[0-9]+)?/?$'
+
+  normalized_value="$(printf '%s' "$1" |
+    sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//' |
+    tr '[:upper:]' '[:lower:]')"
+
+  [[ "$normalized_value" =~ $https_root_pattern ]] ||
+    [[ "$normalized_value" =~ $loopback_root_pattern ]]
+}
+
+doctor() {
+  local failed=0
+  local launch_root
+  local launch_scheme="$root/FoundationApp.xcodeproj/xcshareddata/xcschemes/FoundationApp.xcscheme"
+  local launch_root_enabled
+  local profile_inherits_launch_environment
+  local required_paths=(
+    "FoundationApp.xcodeproj/project.pbxproj"
+    "FoundationApp.xcodeproj/xcshareddata/xcschemes/FoundationApp.xcscheme"
+    "FoundationApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+    "Generated/Application.xcconfig"
+    "FoundationApp/Generated/ApplicationDefinition.swift"
+    "FoundationApp/Generated/ios_v1.json"
+    "FoundationApp/Assets.xcassets/AccentColor.colorset/Contents.json"
+    "FoundationApp/Assets.xcassets/FoundationBackground.colorset/Contents.json"
+    "FoundationAppTests/Generated/ApplicationDefinitionTests.swift"
+    "FoundationAppUITests/Generated/ApplicationNavigationUITests.swift"
+    "FoundationApp/THIRD_PARTY_NOTICES.txt"
+  )
+  local required_settings=(
+    "APP_DISPLAY_NAME"
+    "APP_BUNDLE_IDENTIFIER"
+    "MARKETING_VERSION"
+    "CURRENT_PROJECT_VERSION"
+    "RAILS_ORIGIN"
+    "FOUNDATION_PLAN_SHA256"
+  )
+
+  for path in "${required_paths[@]}"; do
+    if [[ -e "$root/$path" ]]; then
+      printf 'PASS  %s\n' "$path"
+    else
+      printf 'FAIL  missing %s\n' "$path"
+      failed=1
+    fi
+  done
+
+  if [[ -f "$launch_scheme" ]]; then
+    launch_root="$(xmllint --xpath \
+      'string(/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[@key="APP_ROOT_URL"]/@value)' \
+      "$launch_scheme")"
+    launch_root_enabled="$(xmllint --xpath \
+      'string(/Scheme/LaunchAction/EnvironmentVariables/EnvironmentVariable[@key="APP_ROOT_URL"]/@isEnabled)' \
+      "$launch_scheme")"
+    profile_inherits_launch_environment="$(xmllint --xpath \
+      'string(/Scheme/ProfileAction/@shouldUseLaunchSchemeArgsEnv)' \
+      "$launch_scheme")"
+  else
+    launch_root=""
+    launch_root_enabled=""
+    profile_inherits_launch_environment=""
+  fi
+
+  if [[ "$launch_root_enabled" == "YES" ]] && preview_root_is_accepted "$launch_root"; then
+    printf 'PASS  shared Debug launch enables an accepted APP_ROOT_URL\n'
+  else
+    printf 'FAIL  shared Debug launch must enable an HTTPS or HTTP-loopback root APP_ROOT_URL\n'
+    failed=1
+  fi
+
+  if [[ "$profile_inherits_launch_environment" == "NO" ]]; then
+    printf 'PASS  Release Profile action does not inherit Debug launch environment\n'
+  else
+    printf 'FAIL  Release Profile action must not inherit Debug launch environment\n'
+    failed=1
+  fi
+
+  if [[ -f "$root/Generated/Application.xcconfig" ]]; then
+    for setting in "${required_settings[@]}"; do
+      if grep -Eq "^[[:space:]]*${setting}[[:space:]]*=[[:space:]]*[^[:space:]]" \
+        "$root/Generated/Application.xcconfig"; then
+        printf 'PASS  xcconfig defines %s\n' "$setting"
+      else
+        printf 'FAIL  xcconfig missing %s\n' "$setting"
+        failed=1
+      fi
+    done
+
+    if grep -Eq \
+      '^[[:space:]]*FOUNDATION_PLAN_SHA256[[:space:]]*=[[:space:]]*(core-fixture|[0-9a-f]{64})[[:space:]]*$' \
+      "$root/Generated/Application.xcconfig"; then
+      printf 'PASS  xcconfig FOUNDATION_PLAN_SHA256 is a digest or Core sentinel\n'
+    else
+      printf 'FAIL  xcconfig FOUNDATION_PLAN_SHA256 must be a lowercase SHA-256 or core-fixture\n'
+      failed=1
+    fi
+
+    if grep -Eq \
+      '^[[:space:]]*INFOPLIST_KEY_UIUserInterfaceStyle[[:space:]]*=' \
+      "$root/Generated/Application.xcconfig"; then
+      if [[ "$(grep -Ec '^[[:space:]]*INFOPLIST_KEY_UIUserInterfaceStyle[[:space:]]*=' \
+        "$root/Generated/Application.xcconfig")" -ne 1 ]]; then
+        printf 'FAIL  xcconfig UIUserInterfaceStyle must appear only once\n'
+        failed=1
+      elif grep -Eq \
+        '^[[:space:]]*INFOPLIST_KEY_UIUserInterfaceStyle[[:space:]]*=[[:space:]]*(Light|Dark)[[:space:]]*$' \
+        "$root/Generated/Application.xcconfig"; then
+        printf 'PASS  xcconfig fixes UIUserInterfaceStyle to Light or Dark\n'
+      else
+        printf 'FAIL  xcconfig UIUserInterfaceStyle must be Light or Dark when present\n'
+        failed=1
+      fi
+    else
+      printf 'PASS  xcconfig omits UIUserInterfaceStyle for automatic mode\n'
+    fi
+  fi
+
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    configure_xcode
+  fi
+
+  if [[ -n "${DEVELOPER_DIR:-}" ]] &&
+    command -v xcodebuild >/dev/null 2>&1 &&
+    xcodebuild -version >/dev/null 2>&1; then
+    printf 'DEVELOPER_DIR %s\n' "$DEVELOPER_DIR"
+    xcodebuild -version
+  else
+    printf 'INFO  Xcode is unavailable on this host\n'
+  fi
+
+  return "$failed"
+}
+
+lint() {
+  require_xcode
+
+  xcrun swift-format lint --strict \
+    --configuration "$root/.swift-format" \
+    --recursive \
+    "$root/FoundationApp" \
+    "$root/FoundationAppTests" \
+    "$root/FoundationAppUITests"
+  bash -n "$root/bin/ios"
+  plutil -lint \
+    "$root/FoundationApp/Info.plist" \
+    "$root/FoundationApp.xcodeproj/project.pbxproj"
+  xcrun swift -e \
+    'import Foundation; for path in CommandLine.arguments.dropFirst() { let data = try Data(contentsOf: URL(fileURLWithPath: path)); _ = try JSONSerialization.jsonObject(with: data) }' \
+    "$root/FoundationApp/Generated/ios_v1.json" \
+    "$root/FoundationApp.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved"
+  xmllint --noout \
+    "$root/FoundationApp/Base.lproj/LaunchScreen.storyboard" \
+    "$root/FoundationApp.xcodeproj/xcshareddata/xcschemes/FoundationApp.xcscheme" \
+    "$root/FoundationApp.xcodeproj/project.xcworkspace/contents.xcworkspacedata"
+}
+
+case "$command" in
+  build)
+    build
+    ;;
+  test)
+    test_app
+    ;;
+  doctor)
+    doctor
+    ;;
+  lint)
+    lint
+    ;;
+  help|-h|--help)
+    cat <<'EOF'
+Usage: bin/ios COMMAND
+
+Commands:
+  build    Build the unsigned Release app for a generic iOS device
+  test     Run unit and UI targets on separate iOS Simulators
+  doctor   Check the source-owned project and local Xcode
+  lint     Check Swift, shell, plist, JSON, and Xcode project formatting
+EOF
+    ;;
+  *)
+    echo "Unknown iOS command: $command" >&2
+    echo "Run bin/ios help for available commands." >&2
+    exit 1
+    ;;
+esac

@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+
+ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
+
+require "bundler/setup"
+require "dotenv/parser"
+
+def dotenv_keys(contents)
+  # Use dotenv's grammar, including multiline values, without executing its substitutions.
+  contents.gsub(/\r\n?/, "\n").to_enum(:scan, Dotenv::Parser::LINE)
+    .map { Regexp.last_match[:key] }.uniq.sort
+end
+
+explicit_paths = ARGV.map { File.expand_path(it) }
+explicit_paths.each do |path|
+  abort "No such dotenv file: #{path}" unless File.file?(path)
+end
+
+Dir.chdir(File.expand_path("..", __dir__)) do
+  example = File.read(".env.example").gsub(
+    /^[ \t]*#[ \t]*(?=(?:export[ \t]+)?[\w.]+[ \t]*(?:=|:[ \t]))/, ""
+  )
+  documented = dotenv_keys(example)
+  paths = explicit_paths.empty? ? %w[.env .env.local .env.development .env.development.local .env.test .env.test.local] : explicit_paths
+  undocumented = false
+
+  paths.each do |path|
+    next unless File.file?(path)
+
+    keys = dotenv_keys(File.read(path)) - documented
+    next if keys.empty?
+
+    warn "#{path}: undocumented keys: #{keys.join(", ")}"
+    undocumented = true
+  end
+
+  if undocumented
+    warn "Document these settings in .env.example using placeholders, never secrets."
+    exit 1
+  end
+end

@@ -1,0 +1,15 @@
+<%# locals: (form:, attribute:, label:, value:, required: false, disabled: false, errors: [], id: nil, min: nil, max: nil) %>
+<% field_id = id || form.field_id(attribute) %>
+<% error_id = "#{field_id}-errors" %>
+<% date_value = value.respond_to?(:strftime) ? value.strftime("%Y-%m-%d") : value&.to_s %>
+<% minimum = min.respond_to?(:strftime) ? min.strftime("%Y-%m-%d") : min&.to_s %>
+<% maximum = max.respond_to?(:strftime) ? max.strftime("%Y-%m-%d") : max&.to_s %>
+<% props = {name: form.field_name(attribute), id: "#{field_id}-enhanced", value: date_value, min: minimum, max: maximum, label: label, error: errors.presence&.join(". "), required: required, disabled: disabled, locale: I18n.locale.to_s, copy: {open: t("ui.date.open", label: label), calendar: t("ui.date.calendar", label: label), previous: t("ui.date.previous"), next: t("ui.date.next"), today: t("ui.date.today"), selected: t("ui.date.selected")}} %>
+<%= turbo_mount("DatePicker", props: props) do |controller_name| %>
+  <div data-island-fallback class="field">
+    <%= form.label attribute, label, for: field_id, namespace: nil, data: {island_label: true} %>
+    <%= form.date_field attribute, id: field_id, namespace: nil, value: date_value, min: minimum, max: maximum, required: required, disabled: disabled, class: "input", data: {island_input: true, enhanced_id: props[:id]}, aria: {invalid: errors.any?, describedby: (error_id if errors.any?)} %>
+    <%= tag.p errors.join(". "), id: error_id, class: "field-errors", hidden: errors.empty?, data: {island_errors: true} %>
+  </div>
+  <%= tag.div "", "data-#{controller_name}-target" => "mount" %>
+<% end %>

@@ -1,0 +1,13 @@
+<% content_for :title, t(".title") %>
+
+<section class="page-section content-narrow hotwire-native:py-6">
+  <article class="card scaffold-card">
+    <header class="hotwire-native:sr-only">
+      <%= render "shared/ui/page_heading", title: t(".heading") %>
+    </header>
+    <section class="scaffold-form @container">
+      <%= render "form", record: @book, cancel_to: books_path,
+        form_namespace: dom_id(@book, :form) %>
+    </section>
+  </article>
+</section>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="foundation_navigation_back">Back</string>
+    <string name="foundation_navigation_close">Close</string>
+    <string name="foundation_page_load_error_title">Couldn\'t load this screen</string>
+    <string name="foundation_page_load_retry">Try again</string>
+</resources>

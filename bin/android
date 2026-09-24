@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root="$(cd "$(dirname "$0")/.." && pwd)"
+case "${1:-help}" in
+  apk-artifact) shift; exec ruby "$root/bin/android-apk-artifact" "$@" ;;
+  preview)
+    shift
+    if [[ "${1:-}" != "revyl" ]]; then
+      echo 'Usage: bin/android preview revyl [--server URL | doctor | status | stop]' >&2
+      exit 1
+    fi
+    shift
+    exec ruby "$root/bin/android-revyl" "$@"
+    ;;
+  help|-h|--help)
+    echo 'Usage: bin/android preview revyl --server URL'
+    echo '       bin/android preview revyl doctor|status|stop'
+    echo '       bin/android apk-artifact'
+    echo '       bin/android doctor|lint|build|test'
+    ;;
+  *) exec "$root/android/bin/android" "$@" ;;
+esac

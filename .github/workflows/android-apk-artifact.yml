@@ -1,0 +1,52 @@
+name: Android APK artifact
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - "dependabot/**"
+    paths:
+      - "android/**"
+      - "bin/android"
+      - "bin/android-apk-artifact"
+      - ".github/workflows/android-apk-artifact.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-apk-artifact-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      APPROVED_SOURCE_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+        with:
+          cmdline-tools-version: '13114758'
+          log-accepted-android-sdk-licenses: false
+          packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@4c125117fe7c5aed11272ec4213f602f012f89f2 # v5
+      - name: Build the debug APK and manifest
+        run: bin/android apk-artifact
+        env:
+          ANDROID_APK_ARTIFACT_OUTPUT_DIRECTORY: ${{ runner.temp }}/android-apk-artifact
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: android-apk-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/android-apk-artifact/FoundationApp.apk
+            ${{ runner.temp }}/android-apk-artifact/manifest.json
+          if-no-files-found: error
+          retention-days: 7

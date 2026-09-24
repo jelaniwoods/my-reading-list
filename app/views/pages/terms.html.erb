@@ -1,0 +1,67 @@
+<% content_for :title, t("pages.terms.heading") %>
+
+<article class="content-narrow page-section">
+  <%= render "shared/ui/page_heading", title: t("pages.terms.heading") %>
+  <div role="alert" class="alert my-6 border-warning text-warning">
+    <p><%= t("pages.draft_notice") %></p>
+  </div>
+  <div class="space-y-8 text-sm leading-6">
+    <div class="space-y-3">
+      <p><%= t("pages.terms.introduction.paragraph_1_html") %></p>
+      <p><%= t("pages.terms.introduction.paragraph_2_html") %></p>
+      <p><%= t("pages.terms.introduction.paragraph_3") %></p>
+    </div>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.terms.account.heading") %></h2>
+      <p><%= t("pages.terms.account.paragraph_1_html") %></p>
+      <p><%= t("pages.terms.account.paragraph_2") %></p>
+      <p><%= t("pages.terms.account.paragraph_3_html") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.terms.content.heading") %></h2>
+      <p><%= t("pages.terms.content.paragraph_1_html", privacy_link: link_to(t("pages.privacy.heading"), privacy_path, class: "text-link")) %></p>
+      <p><%= t("pages.terms.content.paragraph_2") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.terms.ownership.heading") %></h2>
+      <p><%= t("pages.terms.ownership.paragraph_1") %></p>
+      <p><%= t("pages.terms.ownership.paragraph_2") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.terms.payments.heading") %></h2>
+      <p><%= t("pages.terms.payments.paragraph_1_html") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.terms.termination.heading") %></h2>
+      <p><%= t("pages.terms.termination.paragraph_1") %></p>
+      <p><%= t("pages.terms.termination.paragraph_2_html") %></p>
+      <p><%= t("pages.terms.termination.paragraph_3_html", privacy_link: link_to(t("pages.privacy.heading"), privacy_path, class: "text-link")) %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.terms.changes.heading") %></h2>
+      <p><%= t("pages.terms.changes.paragraph_1") %></p>
+      <p><%= t("pages.terms.changes.paragraph_2_html") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.terms.integrations.heading") %></h2>
+      <p><%= t("pages.terms.integrations.paragraph_1") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.terms.warranties.heading") %></h2>
+      <p><%= t("pages.terms.warranties.paragraph_1_html") %></p>
+      <p><%= t("pages.terms.warranties.paragraph_2") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.terms.liability.heading") %></h2>
+      <p><%= t("pages.terms.liability.paragraph_1_html") %></p>
+      <p><%= t("pages.terms.liability.paragraph_2") %></p>
+    </section>
+    <section class="space-y-3">
+      <h2 class="text-base font-semibold"><%= t("pages.terms.general.heading") %></h2>
+      <p><%= t("pages.terms.general.paragraph_1") %></p>
+      <p><%= t("pages.terms.general.paragraph_2_html") %></p>
+      <p><%= t("pages.terms.general.paragraph_3_html") %></p>
+    </section>
+  </div>
+  <%= render "pages/policy_attribution", policy: "terms" %>
+</article>

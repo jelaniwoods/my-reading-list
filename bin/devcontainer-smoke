@@ -1,0 +1,274 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cli_version="0.88.0"
+suffix="${GITHUB_RUN_ID:-$$}-${GITHUB_RUN_ATTEMPT:-0}"
+label="firstdraft.devcontainer-smoke=${suffix}"
+temporary_root="$(mktemp -d "${TMPDIR:-/tmp}/foundation-devcontainer-smoke.XXXXXX")"
+workspace="${temporary_root}/foundation-${suffix}"
+expected_compose_project="${workspace##*/}_devcontainer"
+expected_devcontainer_image="${expected_compose_project}-rails-app"
+failure_artifacts="${root}/tmp/devcontainer-smoke/${suffix}"
+container_id=""
+compose_project=""
+devcontainer_image=""
+
+devcontainer() {
+  npx --yes "@devcontainers/cli@${cli_version}" "$@"
+}
+
+container_for_label() {
+  docker ps --all --quiet --filter "label=${label}"
+}
+
+service_container() {
+  local service=$1
+  docker ps --all --quiet \
+    --filter "label=com.docker.compose.project=${compose_project}" \
+    --filter "label=com.docker.compose.service=${service}"
+}
+
+discover_compose_project() {
+  local candidate
+  local working_directory
+
+  while IFS= read -r candidate; do
+    [[ -n "${candidate}" ]] || continue
+    working_directory="$(docker inspect --format '{{ index .Config.Labels "com.docker.compose.project.working_dir" }}' "${candidate}" 2>/dev/null || true)"
+    if [[ "${working_directory}" == "${workspace}/.devcontainer" ]]; then
+      docker inspect --format '{{ index .Config.Labels "com.docker.compose.project" }}' "${candidate}"
+      return 0
+    fi
+  done < <(docker ps --all --quiet)
+
+  return 1
+}
+
+show_service_logs() {
+  local service=$1
+  local service_id
+  service_id="$(service_container "${service}")"
+  if [[ -n "${service_id}" ]]; then
+    echo "${service} container logs:" >&2
+    docker logs "${service_id}" 2>&1 | tee "${failure_artifacts}/${service}.log" >&2 || true
+  fi
+}
+
+preserve_failure_artifacts() {
+  mkdir -p "${failure_artifacts}"
+  if [[ -d "${workspace}/tmp/screenshots" ]]; then
+    cp -R "${workspace}/tmp/screenshots" "${failure_artifacts}/screenshots"
+  fi
+  if [[ -d "${workspace}/log" ]]; then
+    cp -R "${workspace}/log" "${failure_artifacts}/log"
+  fi
+  echo "Dev Container failure artifacts: ${failure_artifacts}" >&2
+}
+
+cleanup() {
+  local status=$?
+  local smoke_container
+  trap - EXIT INT TERM
+  set +e
+
+  if [[ -z "${compose_project}" ]]; then
+    smoke_container="$(container_for_label | head -n 1)"
+    if [[ -n "${smoke_container}" ]]; then
+      compose_project="$(docker inspect --format '{{ index .Config.Labels "com.docker.compose.project" }}' "${smoke_container}")"
+    fi
+  fi
+  if [[ -z "${compose_project}" ]]; then
+    compose_project="$(discover_compose_project || true)"
+  fi
+  compose_project="${compose_project:-${expected_compose_project}}"
+  devcontainer_image="${devcontainer_image:-${expected_devcontainer_image}}"
+
+  if (( status != 0 )); then
+    preserve_failure_artifacts
+    show_service_logs postgres
+    show_service_logs rails-app
+    show_service_logs selenium
+  fi
+
+  docker compose --project-name "${compose_project}" \
+    --file "${workspace}/.devcontainer/compose.yaml" \
+    down --volumes --remove-orphans >/dev/null 2>&1 || true
+  docker image rm "${devcontainer_image}" >/dev/null 2>&1 || true
+  rm -rf "${temporary_root}"
+  exit "${status}"
+}
+trap cleanup EXIT INT TERM
+
+run_in_container() {
+  devcontainer exec --workspace-folder "${workspace}" --container-id "${container_id}" "$@"
+}
+
+assert_single_container() {
+  local description=$1
+  local matches=$2
+  local count
+  count="$(printf '%s\n' "${matches}" | sed '/^$/d' | wc -l | tr -d ' ')"
+  if [[ "${count}" != "1" ]]; then
+    echo "Expected one ${description} container, found ${count}" >&2
+    exit 1
+  fi
+}
+
+assert_ssh_server() {
+  docker exec --user root --workdir /workspaces/project "${container_id}" /bin/sh -c '
+    set -eu
+    fail() {
+      echo "$1" >&2
+      exit 1
+    }
+
+    test -x /usr/sbin/sshd || fail "SSH server binary is missing"
+    command -v ssh-keyscan >/dev/null || fail "ssh-keyscan is missing"
+    command -v ssh-keygen >/dev/null || fail "ssh-keygen is missing"
+    /usr/sbin/sshd -t || fail "SSH daemon configuration or host keys are invalid"
+
+    effective_config="$(/usr/sbin/sshd -T)"
+    for expected in \
+      "authenticationmethods publickey" \
+      "gatewayports no" \
+      "kbdinteractiveauthentication no" \
+      "passwordauthentication no" \
+      "permitrootlogin no" \
+      "port 2222" \
+      "pubkeyauthentication yes"; do
+      printf "%s\n" "$effective_config" | grep -Fqx "$expected" || fail "SSH daemon policy differs at: $expected"
+    done
+
+    host_keys="$(ssh-keyscan -T 5 -p 2222 127.0.0.1 2>/dev/null || true)"
+    test -n "$host_keys" || fail "SSH listener returned no host keys on 127.0.0.1:2222"
+    printf "%s\n" "$host_keys" | ssh-keygen -lf - >/dev/null || fail "SSH listener returned an invalid host key"
+  '
+}
+
+cd "${root}"
+if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
+  echo "Commit or remove working-tree changes before running the Dev Container gate" >&2
+  exit 1
+fi
+mkdir "${workspace}"
+git archive HEAD | tar --extract --directory "${workspace}"
+git -C "${workspace}" init --quiet
+git -C "${workspace}" add --all
+git -C "${workspace}" -c user.name="Dev Container Smoke" \
+  -c user.email="devcontainer-smoke@example.invalid" \
+  commit --quiet --message="Freeze generated candidate"
+
+source_commit="$(git rev-parse HEAD)"
+source_tree="$(git rev-parse 'HEAD^{tree}')"
+candidate_tree="$(git -C "${workspace}" rev-parse 'HEAD^{tree}')"
+[[ "${candidate_tree}" == "${source_tree}" ]] || { echo "Archived candidate tree differs from ${source_tree}" >&2; exit 1; }
+[[ ! -e "${workspace}/node_modules" ]] || { echo "Archived candidate unexpectedly has node_modules" >&2; exit 1; }
+[[ ! -e "${workspace}/vendor/bundle" ]] || { echo "Archived candidate unexpectedly has vendor/bundle" >&2; exit 1; }
+echo "Dev Container source commit: ${source_commit}"
+echo "Dev Container source tree: ${source_tree}"
+echo "Dev Container CLI: ${cli_version}"
+echo "Cold lifecycle state: fresh archived source, Git repository, containers, and volume; no host dependency tree"
+echo "Docker image and layer cache: retained runner state"
+
+cold_started_at="$(date +%s)"
+devcontainer up --workspace-folder "${workspace}" --id-label "${label}" --no-lockfile
+cold_up_seconds=$(( $(date +%s) - cold_started_at ))
+
+container_id="$(container_for_label)"
+assert_single_container "Dev Container" "${container_id}"
+assert_ssh_server
+compose_project="$(docker inspect --format '{{ index .Config.Labels "com.docker.compose.project" }}' "${container_id}")"
+devcontainer_image="$(docker inspect --format '{{.Config.Image}}' "${container_id}")"
+devcontainer_image_id="$(docker inspect --format '{{.Image}}' "${container_id}")"
+echo "Dev Container image: ${devcontainer_image_id} (${devcontainer_image})"
+
+postgres_id="$(service_container postgres)"
+assert_single_container PostgreSQL "${postgres_id}"
+cold_postgres_id="${postgres_id}"
+postgres_volume="$(docker inspect --format '{{range .Mounts}}{{if and (eq .Type "volume") (eq .Destination "/var/lib/postgresql")}}{{.Name}}{{end}}{{end}}' "${postgres_id}")"
+[[ "${postgres_volume}" == *_postgres-data ]] || { echo "Expected the PostgreSQL named volume at /var/lib/postgresql" >&2; exit 1; }
+postgres_image_id="$(docker inspect --format '{{.Image}}' "${postgres_id}")"
+postgres_health="$(docker inspect --format '{{.State.Health.Status}}' "${postgres_id}")"
+postgres_restarts="$(docker inspect --format '{{.RestartCount}}' "${postgres_id}")"
+[[ "${postgres_health}" == "healthy" ]] || { echo "Expected healthy PostgreSQL, got ${postgres_health}" >&2; exit 1; }
+[[ "${postgres_restarts}" == "0" ]] || { echo "Expected no PostgreSQL restarts, got ${postgres_restarts}" >&2; exit 1; }
+
+docker exec --user vscode --workdir /workspaces/project "${container_id}" /bin/sh -c '
+  set -eu
+  for command_name in mise ruby bundle node npm; do
+    command -v "$command_name" >/dev/null || { echo "$command_name is not on noninteractive PATH" >&2; exit 1; }
+  done
+  expected_ruby="$(tr -d "\r\n" < .ruby-version)"
+  expected_ruby="${expected_ruby#ruby-}"
+  actual_ruby="$(ruby -e "print RUBY_VERSION")"
+  [ "$actual_ruby" = "$expected_ruby" ] || { echo "Expected Ruby $expected_ruby, got $actual_ruby" >&2; exit 1; }
+  expected_node="v$(tr -d "\r\n" < .node-version)"
+  actual_node="$(node --version)"
+  [ "$actual_node" = "$expected_node" ] || { echo "Expected Node $expected_node, got $actual_node" >&2; exit 1; }
+  mise --version
+  ruby --version
+  node --version
+  npm --version
+'
+
+run_in_container bin/rails db:prepare
+postgres_version="$(docker exec --user vscode --workdir /workspaces/project "${container_id}" bin/rails runner \
+  'print ActiveRecord::Base.connection.select_value("SHOW server_version")')"
+[[ "${postgres_version}" == 18.* ]] || { echo "Expected PostgreSQL 18, got ${postgres_version}" >&2; exit 1; }
+postgres_data_directory="$(docker exec --user vscode --workdir /workspaces/project "${container_id}" bin/rails runner \
+  'print ActiveRecord::Base.connection.select_value("SHOW data_directory")')"
+[[ "${postgres_data_directory}" == /var/lib/postgresql/* ]] || { echo "Expected PGDATA under /var/lib/postgresql, got ${postgres_data_directory}" >&2; exit 1; }
+
+run_in_container /bin/bash -c '
+  set -Eeuo pipefail
+  bin/rails server --binding 127.0.0.1 --port 3100 &
+  server_pid=$!
+  trap "kill ${server_pid} >/dev/null 2>&1 || true" EXIT
+  for _ in {1..60}; do
+    status="$(curl --silent --output /dev/null --write-out "%{http_code}" http://127.0.0.1:3100/ready || true)"
+    [[ "${status}" == "200" ]] && exit 0
+    kill -0 "${server_pid}" >/dev/null 2>&1 || exit 1
+    sleep 1
+  done
+  echo "Rails did not become ready" >&2
+  exit 1
+'
+
+run_in_container env CI=true bin/ci
+
+cluster_before="$(docker exec --user vscode --workdir /workspaces/project "${container_id}" bin/rails runner \
+  'print ActiveRecord::Base.connection.select_value("SELECT system_identifier FROM pg_control_system()")')"
+cold_container_id="${container_id}"
+
+docker compose --project-name "${compose_project}" \
+  --file "${workspace}/.devcontainer/compose.yaml" \
+  down --remove-orphans
+echo "Warm lifecycle state: same source, built image, and PostgreSQL named volume; recreated containers"
+
+warm_started_at="$(date +%s)"
+devcontainer up --workspace-folder "${workspace}" --id-label "${label}" --no-lockfile
+warm_up_seconds=$(( $(date +%s) - warm_started_at ))
+
+container_id="$(container_for_label)"
+assert_single_container "recreated Dev Container" "${container_id}"
+[[ "${container_id}" != "${cold_container_id}" ]] || { echo "Expected the Dev Container to be recreated" >&2; exit 1; }
+assert_ssh_server
+run_in_container bin/setup --skip-server
+
+postgres_id="$(service_container postgres)"
+assert_single_container "recreated PostgreSQL" "${postgres_id}"
+[[ "${postgres_id}" != "${cold_postgres_id}" ]] || { echo "Expected the PostgreSQL container to be recreated" >&2; exit 1; }
+postgres_volume_after="$(docker inspect --format '{{range .Mounts}}{{if and (eq .Type "volume") (eq .Destination "/var/lib/postgresql")}}{{.Name}}{{end}}{{end}}' "${postgres_id}")"
+postgres_health="$(docker inspect --format '{{.State.Health.Status}}' "${postgres_id}")"
+cluster_after="$(docker exec --user vscode --workdir /workspaces/project "${container_id}" bin/rails runner \
+  'print ActiveRecord::Base.connection.select_value("SELECT system_identifier FROM pg_control_system()")')"
+
+[[ "${postgres_health}" == "healthy" ]] || { echo "Expected healthy PostgreSQL after restart, got ${postgres_health}" >&2; exit 1; }
+[[ "${postgres_volume_after}" == "${postgres_volume}" ]] || { echo "Recreated PostgreSQL did not mount the same named volume" >&2; exit 1; }
+[[ "${cluster_after}" == "${cluster_before}" ]] || { echo "PostgreSQL volume did not retain its cluster" >&2; exit 1; }
+
+echo "Cold Dev Container up: ${cold_up_seconds}s"
+echo "Warm Dev Container up: ${warm_up_seconds}s"
+echo "PostgreSQL ${postgres_version}; image ${postgres_image_id}; cluster ${cluster_after}"
+echo "SSH, setup, db:prepare, boot, full CI, and second start passed"

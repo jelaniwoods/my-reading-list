@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Foundation" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/foundation_accent</item>
+        <item name="colorSurface">@color/foundation_background</item>
+        <item name="android:colorBackground">@color/foundation_background</item>
+        <item name="toolbarStyle">@style/Widget.Material3.Toolbar.OnSurface</item>
+        <item name="bottomNavigationStyle">@style/Widget.Foundation.BottomNavigationView</item>
+        <item name="android:windowLightStatusBar">@bool/foundation_light_system_bars</item>
+        <item name="android:windowLightNavigationBar">@bool/foundation_light_system_bars</item>
+    </style>
+    <style name="Widget.Foundation.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="labelVisibilityMode">labeled</item>
+        <item name="labelMaxLines">999</item>
+        <item name="labelFontScalingEnabled">true</item>
+    </style>
+    <bool name="foundation_light_system_bars">true</bool>
+</resources>

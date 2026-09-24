@@ -1,0 +1,26 @@
+<% content_for :title, t(".title") %>
+
+<section class="page-section content-list hotwire-native:py-6">
+  <article class="card scaffold-card">
+    <header>
+      <%= render "shared/ui/page_heading", title: t(".heading"), hide_in_native: true %>
+      <%= link_to t(".new_action"), new_book_path, class: "btn" %>
+    </header>
+    <section class="record-list-body">
+      <% if @books.load.any? %>
+        <ul class="item-group record-list">
+          <%= render partial: "books/list_item", collection: @books, as: :book,
+            locals: {heading_tag: :h2, dom_prefix: :list} %>
+        </ul>
+        <%= render "shared/pagination", pagy: @pagy %>
+      <% elsif @pagy.count.positive? %>
+        <%= render "shared/ui/empty_state", title: t("shared.pagination.empty.heading"),
+          description: t("shared.pagination.empty.body"),
+          action_label: t("shared.pagination.empty.action"), action_path: books_path %>
+      <% else %>
+        <%= render "shared/ui/empty_state", title: t(".empty.heading"),
+          description: t(".empty.body") %>
+      <% end %>
+    </section>
+  </article>
+</section>

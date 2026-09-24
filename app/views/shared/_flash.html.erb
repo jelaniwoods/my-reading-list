@@ -1,0 +1,17 @@
+<%# locals: (inline: false) %>
+<%# Keep empty regions present: inserting a live region only at announce time is not reliably announced. %>
+<div id="flash_notices" role="status" aria-atomic="true">
+  <% flash.to_h.except("alert", "success").each_value do |message| %>
+    <% next if message.blank? %>
+    <div class="<%= inline ? "mb-6 text-sm leading-6" : "mt-8 alert" %>" data-flash-message>
+      <p><%= message %></p>
+    </div>
+  <% end %>
+</div>
+<div id="flash_alerts" role="alert" aria-atomic="true">
+  <% if flash[:alert].present? %>
+    <div class="<%= inline ? "mb-6 text-sm leading-6 text-destructive" : "mt-8 alert" %>" data-variant="destructive" data-flash-message>
+      <p id="flash_error_message"><%= flash[:alert] %></p>
+    </div>
+  <% end %>
+</div>

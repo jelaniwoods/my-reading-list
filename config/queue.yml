@@ -1,0 +1,30 @@
+# Solid Queue 1.x has no LISTEN/NOTIFY, so a poll is a real query and the interval
+# is also the worst-case job pickup latency. Development and test poll aggressively
+# against a local database, where that traffic is free. Production's database is
+# off-platform (see DEPLOY.md) and Render meters every query as billable outbound
+# bandwidth, so production trades pickup latency for ~95% less idle chatter.
+default: &default
+  dispatchers:
+    - polling_interval: 1
+      batch_size: 500
+  workers:
+    - queues: "*"
+      threads: 3
+      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      polling_interval: 0.1
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  dispatchers:
+    - polling_interval: <%= ENV.fetch("SOLID_QUEUE_DISPATCH_INTERVAL", 5) %>
+      batch_size: 500
+  workers:
+    - queues: "*"
+      threads: 3
+      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      polling_interval: <%= ENV.fetch("SOLID_QUEUE_POLL_INTERVAL", 5) %>
