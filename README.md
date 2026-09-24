@@ -5,8 +5,9 @@ delete books; each book has a required title and author, an optional note, and a
 opens on the book list, and the iPhone (`ios/`) and Android (`android/`) clients open on the same public list.
 Development setup loads three sample books.
 
-This app started with First Draft. The generated baseline does not yet set a database default for Finished;
-see `.firstdraft/design/implementation-notes.md` and `.firstdraft/gaps.json`.
+This app started with First Draft. Its one reviewed support gap (the Finished default) has since been
+implemented in ordinary source; see `.firstdraft/design/implementation-notes.md`. Pages sit on an animated
+gradient background that stays still when the viewer prefers reduced motion.
 
 ## Setup and run
 

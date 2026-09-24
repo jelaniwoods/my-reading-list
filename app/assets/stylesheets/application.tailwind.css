@@ -360,7 +360,48 @@ body[data-hotwire-native-app="true"] [data-sonner-toast] [data-close-button] {
   min-height: 3rem;
 }
 
+/* Animated page gradient. Cards keep their solid tokens so content stays readable.
+   Unlayered so it replaces the body's bg-background utility. */
+html {
+  background-color: var(--background);
+}
+body {
+  background: transparent;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(
+    120deg,
+    var(--page-gradient-1),
+    var(--page-gradient-2),
+    var(--page-gradient-3),
+    var(--page-gradient-4),
+    var(--page-gradient-1)
+  );
+  background-size: 400% 400%;
+  animation: page-gradient-shift 24s ease-in-out infinite;
+}
+@keyframes page-gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
+
   :is(
     [data-slot="popover-content"],
     [data-slot="combobox-content"],
